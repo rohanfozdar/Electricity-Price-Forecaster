@@ -212,22 +212,10 @@ This repository supports the paper:
 
 The paper contains the full methodology, feature construction details, model descriptions, and discussion of results.
 
----
-
-## Citation
-
-```bibtex
-@misc{fozdar2026ercot,
-  title  = {A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals},
-  author = {Fozdar, Rohan},
-  year   = {2026},
-  note   = {Mathematics Capstone Project, Knox College}
-}
-```
 
 ---
 
-## Author
+
 
 **Rohan Fozdar**
 Knox College
