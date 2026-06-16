@@ -1,0 +1,34 @@
+# --- Secrets ---
+.env
+
+# --- Python / build artifacts ---
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+build/
+*.egg-info/
+.ipynb_checkpoints/
+.DS_Store
+
+# --- Trained model artifacts (regenerable) ---
+models/*.pkl
+models/*.json
+models/artifacts/
+
+# --- Data: ignore everything except the canonical engineered matrix ---
+data/raw/
+data/processed/
+data/features/*
+!data/features/.gitkeep
+!data/features/feature_matrix_engineered_v2.parquet
+
+# --- Notebooks intentionally excluded from the public repo ---
+# (diagnostics, TimesFM-hybrid, and the retrieval-augmented experiment)
+notebooks/01_data_inspection.ipynb
+notebooks/03_build_raw_matrix.ipynb
+notebooks/04_build_engineered_matrix.ipynb
+notebooks/11_residual_diagnostics (1).ipynb
+notebooks/15_timesfm_xgboost_augmented.ipynb
+notebooks/17_feature_diagnostics.ipynb
+notebooks/18_rag_forecaster.ipynb

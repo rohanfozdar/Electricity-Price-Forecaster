@@ -1,0 +1,42 @@
+[project]
+name = "ercot-grid-forecaster"
+version = "0.1.0"
+description = "ML system for forecasting ERCOT electricity spot prices using weather, supply-side, and public sentiment signals."
+requires-python = ">=3.9"
+dependencies = [
+    # Core data
+    "pandas",
+    "numpy",
+    "pyarrow",
+    # APIs
+    "requests",
+    "praw",
+    "gridstatus",
+    # ML
+    "scikit-learn",
+    "xgboost",
+    "lightgbm",
+    "statsmodels",
+    # Visualization
+    "matplotlib",
+    "seaborn",
+    "plotly",
+    # Dashboard
+    "streamlit",
+    # Utilities
+    "xlrd",
+    "python-dotenv",
+    "tqdm",
+    "schedule",
+    # Testing
+    "pytest",
+    # Notebooks
+    "jupyterlab",
+]
+
+[tool.setuptools]
+packages = ["pipelines", "utils", "models", "evaluation", "dashboard"]
+
+[build-system]
+requires = ["setuptools>=64.0"]
+build-backend = "setuptools.build_meta"

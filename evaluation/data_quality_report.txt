@@ -1,0 +1,162 @@
+========================================================================
+ERCOT GRID FORECASTER — FEATURE MATRIX DATA QUALITY REPORT
+Generated: 2024-04-10
+========================================================================
+
+── SHAPE & DATE RANGE ──────────────────────────────────────────────
+  Total rows:       34,873  (raw: 35,041, warmup dropped: 168)
+  Total columns:    90
+  Start:            2021-01-08 06:00:00+00:00
+  End:              2024-12-31 06:00:00+00:00
+  Index timezone:   UTC
+  Index frequency:  hourly (15-min RT prices resampled to max)
+
+── COLUMNS BY CATEGORY (null %) ───────────────────────────────────
+  [RT Price (target)]
+    HB_HOUSTON                                              0.0%
+    HB_HUBAVG                                               0.0%
+    HB_NORTH                                                0.0%
+    HB_SOUTH                                                0.0%
+    HB_WEST                                                 0.0%
+  [DA Price (benchmark)]
+    da_HB_HOUSTON                                           0.0%
+    da_HB_HUBAVG                                            0.0%
+    da_HB_NORTH                                             0.0%
+    da_HB_SOUTH                                             0.0%
+    da_HB_WEST                                              0.0%
+  [Load]
+    load_actual_mw                                          0.0%
+    load_lag_1h                                             0.0%
+    load_rollmean_24h                                       0.1%
+  [Weather (raw)]
+    Houston_cloud_cover                                     0.0%
+    Houston_precipitation                                   0.0%
+    Houston_relative_humidity_2m                            0.0%
+    Houston_temperature_2m                                  0.0%
+    Houston_wind_gusts_10m                                  0.0%
+    Houston_wind_speed_10m                                  0.0%
+    North (Dallas)_cloud_cover                              0.0%
+    North (Dallas)_precipitation                            0.0%
+    North (Dallas)_relative_humidity_2m                     0.0%
+    North (Dallas)_temperature_2m                           0.0%
+    North (Dallas)_wind_gusts_10m                           0.0%
+    North (Dallas)_wind_speed_10m                           0.0%
+    South (San Antonio)_cloud_cover                         0.0%
+    South (San Antonio)_precipitation                       0.0%
+    South (San Antonio)_relative_humidity_2m                0.0%
+    South (San Antonio)_temperature_2m                      0.0%
+    South (San Antonio)_wind_gusts_10m                      0.0%
+    South (San Antonio)_wind_speed_10m                      0.0%
+    West (Midland)_cloud_cover                              0.0%
+    West (Midland)_precipitation                            0.0%
+    West (Midland)_relative_humidity_2m                     0.0%
+    West (Midland)_temperature_2m                           0.0%
+    West (Midland)_wind_gusts_10m                           0.0%
+    West (Midland)_wind_speed_10m                           0.0%
+  [Weather (derived)]
+    temp_max_across_zones                                   0.0%
+    temp_min_across_zones                                   0.0%
+    temp_range_across_zones                                 0.0%
+    wind_mean_across_zones                                  0.0%
+    wind_min_across_zones                                   0.0%
+  [Gas]
+    henry_hub_price                                         0.0%
+  [Storage]
+    storage_bcf                                             0.0%
+    storage_wow_change                                      0.0%
+  [Reactor (NRC)]
+    reactor_comanche_peak_1_pct                           100.0%  <<< 100% NULL — missing pipeline
+    reactor_comanche_peak_2_pct                           100.0%  <<< 100% NULL — missing pipeline
+    reactor_south_texas_1_pct                             100.0%  <<< 100% NULL — missing pipeline
+    reactor_south_texas_2_pct                             100.0%  <<< 100% NULL — missing pipeline
+    reactors_offline_pct_sum                                0.0%
+    stress_reactor_outage                                   0.0%
+  [Google Trends]
+    trend_ac_repair_houston                                 0.0%
+    trend_electricity_bill_texas                            0.0%
+    trend_ercot                                             0.0%
+    trend_generator_for_sale                                0.0%
+    trend_grid_failure                                      0.0%
+    trend_power_outage_texas                                0.0%
+    trend_rolling_blackout                                  0.0%
+    trend_space_heater                                      0.0%
+  [GDELT]
+    gdelt_article_volume                                   14.1%
+    gdelt_article_volume_lag_24h                           14.2%
+    gdelt_article_volume_lag_48h                           14.2%
+    gdelt_tone                                              0.0%
+    gdelt_tone_lag_24h                                      0.0%
+    gdelt_tone_lag_48h                                      0.0%
+    norm                                                   14.1%
+  [Price Lags & Rolls]
+    hubavg_lag_168h                                         0.0%
+    hubavg_lag_1h                                           0.0%
+    hubavg_lag_24h                                          0.0%
+    hubavg_lag_3h                                           0.0%
+    hubavg_lag_6h                                           0.0%
+    hubavg_rollmean_168h                                    0.0%
+    hubavg_rollmean_24h                                     0.0%
+    hubavg_rollstd_168h                                     0.0%
+    hubavg_rollstd_24h                                      0.0%
+  [Load Lags]
+    load_lag_1h                                             0.0%
+    load_rollmean_24h                                       0.1%
+  [Sentiment Lags]
+    gdelt_article_volume_lag_24h                           14.2%
+    gdelt_article_volume_lag_48h                           14.2%
+    gdelt_tone_lag_24h                                      0.0%
+    gdelt_tone_lag_48h                                      0.0%
+  [Stress Indicators]
+    stress_cold_snap                                        0.0%
+    stress_extreme_heat                                     0.0%
+    stress_freeze                                           0.0%
+    stress_gas_spike                                        0.0%
+    stress_heat_wave                                        0.0%
+    stress_low_wind                                         0.0%
+    stress_reactor_outage                                   0.0%
+    stress_score                                            0.0%
+  [Temporal]
+    day_of_week                                             0.0%
+    hour                                                    0.0%
+    is_peak_hours                                           0.0%
+    is_weekend                                              0.0%
+    month                                                   0.0%
+  [Targets]
+    future_price_max_24h                                    0.1%
+    future_spike_24h                                        0.0%
+    price_spike_flag                                        0.0%
+
+── SPIKE & TARGET RATES ───────────────────────────────────────────
+  price_spike_flag  (HB_HUBAVG > $200/MWh):      3.14%  (1,094 hours)
+  future_spike_24h  (spike arriving in next 24h): 27.17%  (9,476 hours)
+
+── HB_HUBAVG DISTRIBUTION ─────────────────────────────────────────
+  Mean          $     86.22/MWh
+  Median        $     26.54/MWh
+  Std           $    539.76/MWh
+  Min           $    -31.78/MWh
+  Max           $   9051.55/MWh
+  95th pct      $    115.77/MWh
+  99th pct      $   1011.77/MWh
+
+── 100% NULL COLUMNS ──────────────────────────────────────────────
+  reactor_comanche_peak_1_pct  (NRC individual reactor % — NRC page format changed)
+  reactor_comanche_peak_2_pct  (NRC individual reactor % — NRC page format changed)
+  reactor_south_texas_1_pct  (NRC individual reactor % — NRC page format changed)
+  reactor_south_texas_2_pct  (NRC individual reactor % — NRC page format changed)
+
+── TRAIN / VAL / TEST SPLIT ───────────────────────────────────────
+  Train  2021-2022:   17,346 rows  49.7%  spikes: 689  (3.97%)
+  Val    2023:         8,760 rows  25.1%  spikes: 291  (3.32%)
+  Test   2024:         8,767 rows  25.1%  spikes: 114  (1.30%)
+
+── LOOK-AHEAD LEAKAGE CHECK ───────────────────────────────────────
+  hubavg_lag_1h   is exactly shift(1) of HB_HUBAVG:   PASS
+  hubavg_lag_168h is exactly shift(168) of HB_HUBAVG: PASS
+  future_spike_24h differs from price_spike_flag:      PASS (correctly forward-looking target)
+  Warmup rows dropped (lag_168h NaN period):           168 rows — PASS
+
+========================================================================
+Feature matrix ready. Shape: 34,873 rows x 90 columns.
+Spike rate: 3.14%. Ready for model training.
+========================================================================
