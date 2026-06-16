@@ -218,6 +218,6 @@ The paper contains the full methodology, feature construction details, model des
 
 
 **Rohan Fozdar**
-Knox College
+Knox College  
 Mathematics Capstone Project
 
