@@ -3,10 +3,18 @@
 from __future__ import annotations
 
 import pandas as pd
+import pytest
 
 from utils.config import RAW_DIR
 
 PARQUET_PATH = RAW_DIR / "ercot_rt_prices.parquet"
+
+# data/raw/ is gitignored, so a fresh clone has no ERCOT RT parquet.
+# Skip rather than fail: run `python run_pipeline.py` to populate it.
+pytestmark = pytest.mark.skipif(
+    not PARQUET_PATH.exists(),
+    reason=f"{PARQUET_PATH} not present - run the ERCOT RT pipeline first",
+)
 EXPECTED_HUBS = ["HB_HOUSTON", "HB_NORTH", "HB_SOUTH", "HB_WEST", "HB_HUBAVG"]
 
 

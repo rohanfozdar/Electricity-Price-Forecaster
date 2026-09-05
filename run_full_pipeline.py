@@ -21,6 +21,7 @@ parquet files already exist.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import traceback
 from pathlib import Path
@@ -91,14 +92,31 @@ def run_features():
     print("  STAGE 2: FEATURE ENGINEERING")
     print("=" * 60 + "\n")
 
-    from features.build_matrix import build_feature_matrix
-    from features.engineer import engineer_features
     from features.build_matrix_v2 import build_feature_matrix_v2
     from features.engineer_v2 import engineer_features_v2
 
-    matrix = build_feature_matrix()
-    engineer_features(matrix)
+    # Both matrix builders read data/raw/, which is gitignored. A fresh clone
+    # ships only data/features/feature_matrix_engineered_v2.parquet, so skip
+    # rather than traceback when the raw sources were never pulled.
+    if not any(RAW_DIR.glob("*.parquet")):
+        print("[skip] data/raw/ is empty - nothing to rebuild from.")
+        print("       The engineered v2 matrix already ships with the repo:")
+        print(f"         {FEATURES_DIR / 'feature_matrix_engineered_v2.parquet'}")
+        print("       To regenerate it from scratch, first run:")
+        print("         python run_full_pipeline.py --stage pipelines")
+        return
 
+    # v1 is deprecated and kept only for reproducing the original report.
+    # It needs the same raw sources, so it is opt-in via BUILD_V1_MATRIX=1.
+    if os.environ.get("BUILD_V1_MATRIX") == "1":
+        from features.build_matrix import build_feature_matrix
+        from features.engineer import engineer_features
+        print("\n--- v1 matrix (deprecated) ---")
+        engineer_features(build_feature_matrix())
+    else:
+        print("[skip] v1 matrix (deprecated). Set BUILD_V1_MATRIX=1 to build it.")
+
+    print("\n--- v2 matrix ---")
     matrix_v2 = build_feature_matrix_v2()
     engineer_features_v2(matrix_v2)
 
@@ -107,6 +125,16 @@ def run_models():
     print("\n" + "=" * 60)
     print("  STAGE 3: MODEL TRAINING")
     print("=" * 60 + "\n")
+
+    v2_matrix = FEATURES_DIR / "feature_matrix_engineered_v2.parquet"
+    if not v2_matrix.exists():
+        raise SystemExit(
+            f"Missing {v2_matrix}\n"
+            "Every training script reads this file. It normally ships with the repo;\n"
+            "if you deleted it, regenerate with:\n"
+            "  python run_full_pipeline.py --stage pipelines\n"
+            "  python run_full_pipeline.py --stage features"
+        )
 
     from models.train_baseline import train_baseline
     from models.train_enhanced import train_enhanced

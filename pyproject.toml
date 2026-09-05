@@ -10,7 +10,6 @@ dependencies = [
     "pyarrow",
     # APIs
     "requests",
-    "praw",
     "gridstatus",
     # ML
     "scikit-learn",
@@ -32,6 +31,20 @@ dependencies = [
     "pytest",
     # Notebooks
     "jupyterlab",
+]
+
+[project.optional-dependencies]
+# Heavy / model-specific dependencies, kept out of the base install so a clone
+# stays quick to set up. Install only the family you intend to run.
+trees = ["catboost", "ngboost"]
+deep = ["torch", "pytorch-forecasting", "pytorch-lightning"]
+foundation = ["chronos-forecasting", "transformers", "accelerate"]
+classical = ["prophet", "pmdarima"]
+all = [
+    "catboost", "ngboost",
+    "torch", "pytorch-forecasting", "pytorch-lightning",
+    "chronos-forecasting", "transformers", "accelerate",
+    "prophet", "pmdarima",
 ]
 
 [tool.setuptools]

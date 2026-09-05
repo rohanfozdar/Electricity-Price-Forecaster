@@ -30,25 +30,40 @@ st.caption("Sentiment-enhanced ML forecaster for Texas electricity prices")
 
 @st.cache_data
 def load_data():
-    df = pd.read_parquet(FEATURES_DIR / "feature_matrix_engineered.parquet")
+    df = pd.read_parquet(FEATURES_DIR / "feature_matrix_engineered_v2.parquet")
     return df
 
 
 @st.cache_resource
 def load_models():
-    enhanced_reg_path = Path("models/artifacts/enhanced_regressor.json")
-    enhanced_clf_path = Path("models/artifacts/enhanced_classifier.json")
+    """Load the v2 enhanced artifacts.
+
+    models/artifacts/ is gitignored, so a fresh clone has none of these.
+    Returns a `loaded` flag so the caller can explain that rather than
+    silently rendering a dashboard with no predictions on it.
+    """
+    enhanced_reg_path = Path("models/artifacts/enhanced_v2_regressor.json")
+    enhanced_clf_path = Path("models/artifacts/enhanced_v2_classifier.json")
     reg = xgb.XGBRegressor()
     clf = xgb.XGBClassifier()
+    loaded = enhanced_reg_path.exists() and enhanced_clf_path.exists()
     if enhanced_reg_path.exists():
         reg.load_model(str(enhanced_reg_path))
     if enhanced_clf_path.exists():
         clf.load_model(str(enhanced_clf_path))
-    return reg, clf
+    return reg, clf, loaded
 
 
 df = load_data()
-reg, clf = load_models()
+reg, clf, models_loaded = load_models()
+
+if not models_loaded:
+    st.warning(
+        "No trained artifacts found in `models/artifacts/` (they are gitignored and "
+        "regenerable). Price history still renders; forecasts and spike probabilities "
+        "will be blank until you run:\n\n"
+        "```bash\npython run_full_pipeline.py --stage models\n```"
+    )
 
 # Sidebar controls
 st.sidebar.header("View Settings")
@@ -71,7 +86,7 @@ else:
 
 # Compute predictions on view
 features = select_enhanced_features(df)
-X = view[features].fillna(method="ffill").fillna(0)
+X = view[features].ffill().fillna(0)
 try:
     view["model_forecast"] = reg.predict(X)
 except Exception:
@@ -149,12 +164,14 @@ else:
 
 # --- Feature importance ---
 st.subheader("Model Feature Importance")
-fi_path = Path("models/artifacts/enhanced_feature_importance.csv")
+fi_path = Path("models/artifacts/enhanced_v2_feature_importance.csv")
 if fi_path.exists():
-    fi = pd.read_csv(fi_path, index_col=0, header=None, names=["feature", "importance"])
-    fi = fi.sort_values("importance", ascending=True).tail(20)
+    # Same read pattern as models/train_all_v2.py:_select_top_sentiment_features -
+    # to_csv() on an unnamed Series writes a header row, so header=0 is correct.
+    fi = pd.read_csv(fi_path, index_col=0).iloc[:, 0]
+    fi = fi.sort_values(ascending=True).tail(20)
     bar = go.Figure(go.Bar(
-        x=fi["importance"], y=fi["feature"], orientation="h",
+        x=fi.values, y=fi.index, orientation="h",
     ))
     bar.update_layout(height=500, xaxis_title="Importance", yaxis_title="")
     st.plotly_chart(bar, use_container_width=True)

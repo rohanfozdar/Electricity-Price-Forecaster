@@ -21,6 +21,7 @@ import xgboost as xgb
 from utils.config import FEATURES_DIR
 from models.utils import (
     TARGET_CLASS,
+    apply_feature_transforms,
     chronological_split,
     classification_report,
     select_baseline_features,
@@ -88,7 +89,10 @@ def _train_classifier(df, features, model_name: str):
 
 def train_spike_classifier():
     print("\n=== Training Spike Classifiers ===\n")
-    df = pd.read_parquet(FEATURES_DIR / "feature_matrix_engineered.parquet")
+    # log1p skewed columns, matching the model notebooks (see models/utils.py).
+    df = apply_feature_transforms(
+        pd.read_parquet(FEATURES_DIR / "feature_matrix_engineered_v2.parquet")
+    )
     df = df.dropna(subset=[TARGET_CLASS])
 
     print(f"\n--- Baseline classifier (no sentiment) ---")
