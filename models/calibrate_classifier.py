@@ -8,7 +8,7 @@ tradeoff: the classifier flips from 100% recall at 0.4 to 0% recall at
 0.6 over a tiny range. Calibration spreads the probabilities back across
 [0,1] so threshold sweeps actually behave like sweeps.
 
-Approach: fit `CalibratedClassifierCV(estimator=trained_xgb, cv='prefit')`
+Approach: fit `CalibratedClassifierCV(FrozenEstimator(trained_xgb))`
 on the held-out 2023 validation set. We try two methods:
     - Platt scaling (sigmoid)  - assumes logistic post-fit, parametric
     - Isotonic regression       - non-parametric, more flexible but
@@ -31,6 +31,11 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.calibration import CalibratedClassifierCV
+
+try:  # scikit-learn >= 1.6
+    from sklearn.frozen import FrozenEstimator
+except ImportError:  # pragma: no cover - older scikit-learn
+    FrozenEstimator = None
 from sklearn.metrics import (
     average_precision_score, brier_score_loss, roc_auc_score,
 )
@@ -115,8 +120,9 @@ def calibrate():
     print(f"  Raw test ROC-AUC: {raw_roc:.4f}")
     print(f"  Raw test Brier:   {raw_brier:.4f}")
 
-    # CalibratedClassifierCV needs sklearn-style fit; cv='prefit' uses our
-    # held-out validation set as the calibration set without re-training.
+    # Calibrate the already-trained booster against the held-out validation
+    # set, without re-training it. cv="prefit" did this until scikit-learn
+    # removed it in 1.8; FrozenEstimator (added in 1.6) is the replacement.
     results = {"raw": {
         "distribution": raw_dist,
         "pr_auc": float(raw_pr),
@@ -128,7 +134,10 @@ def calibrate():
     methods = {}
     for method in ("sigmoid", "isotonic"):
         print(f"\n  --- Fitting {method} calibrator on validation set ---")
-        cal = CalibratedClassifierCV(estimator=booster, method=method, cv="prefit")
+        if FrozenEstimator is not None:
+            cal = CalibratedClassifierCV(FrozenEstimator(booster), method=method)
+        else:
+            cal = CalibratedClassifierCV(estimator=booster, method=method, cv="prefit")
         cal.fit(X_val, y_val)
 
         cal_proba_test = cal.predict_proba(X_test)[:, 1]
