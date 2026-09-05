@@ -24,6 +24,7 @@ from utils.config import FEATURES_DIR
 from models.utils import (
     TARGET_REG,
     TARGET_CLASS,
+    apply_feature_transforms,
     chronological_split,
     regression_report,
     classification_report,
@@ -167,7 +168,10 @@ def main():
     if not V2_MATRIX.exists():
         raise RuntimeError(f"Run features/build_matrix_v2.py first - missing {V2_MATRIX}")
 
-    df = pd.read_parquet(V2_MATRIX)
+    # log1p the 34 heavily right-skewed columns. The model notebooks all do this
+    # (see notebooks/02_v2_models.ipynb and 10_chronos), so applying it here keeps
+    # the script path and the notebook path on the same pipeline.
+    df = apply_feature_transforms(pd.read_parquet(V2_MATRIX))
 
     # Drop rows missing the targets
     df_reg = df.dropna(subset=[TARGET_REG])

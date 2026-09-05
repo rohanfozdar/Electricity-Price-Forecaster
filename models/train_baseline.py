@@ -21,6 +21,7 @@ import xgboost as xgb
 from utils.config import FEATURES_DIR
 from models.utils import (
     TARGET_REG,
+    apply_feature_transforms,
     chronological_split,
     regression_report,
     select_baseline_features,
@@ -32,7 +33,10 @@ MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
 def train_baseline():
     print("\n=== Training Baseline Regression Model ===\n")
-    df = pd.read_parquet(FEATURES_DIR / "feature_matrix_engineered_v2.parquet") 
+    # log1p skewed columns, matching the model notebooks (see models/utils.py).
+    df = apply_feature_transforms(
+        pd.read_parquet(FEATURES_DIR / "feature_matrix_engineered_v2.parquet")
+    ) 
     df = df.dropna(subset=[TARGET_REG])
 
     train, val, test = chronological_split(df)
