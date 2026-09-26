@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals - Rohan Fozdar">
+  <meta name="description" content="Next-hour ERCOT electricity price forecasting across 13 model configurations. A Chronos + XGBoost hybrid reaches $12.13/MWh MAE and 61% spike recall on 2024 data.">
+  <meta name="keywords" content="electricity price forecasting, ERCOT, price spikes, time series foundation models, Chronos, XGBoost, news sentiment, GDELT, energy markets, multimodal forecasting">
+  <meta name="author" content="Rohan Fozdar">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Knox College">
+  <meta property="og:title" content="A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals">
+  <meta property="og:description" content="Next-hour ERCOT electricity price forecasting across 13 model configurations. A Chronos + XGBoost hybrid reaches $12.13/MWh MAE and 61% spike recall on 2024 data.">
+  <meta property="og:url" content="https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/">
+  <meta property="og:image" content="https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/static/images/social_preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A Multimodal Framework for Electricity Price Forecasting - Research Preview">
+  <meta property="article:author" content="Rohan Fozdar">
+  <meta property="article:section" content="Research">
+  <meta property="article:tag" content="electricity price forecasting">
+  <meta property="article:tag" content="time series foundation models">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals">
+  <meta name="twitter:description" content="Next-hour ERCOT electricity price forecasting across 13 model configurations. A Chronos + XGBoost hybrid reaches $12.13/MWh MAE and 61% spike recall on 2024 data.">
+  <meta name="twitter:image" content="https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/static/images/social_preview.png">
+  <meta name="twitter:image:alt" content="A Multimodal Framework for Electricity Price Forecasting - Research Preview">
+
+  <!-- Academic/Research Specific -->
+  <meta name="citation_title" content="A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals">
+  <meta name="citation_author" content="Fozdar, Rohan">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="Knox College Mathematics Capstone">
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#1f4e79">
+  <meta name="msapplication-TileColor" content="#1f4e79">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>A Multimodal Framework for Electricity Price Forecasting - Rohan Fozdar</title>
+
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link rel="apple-touch-icon" href="static/images/favicon.ico">
+
+  <!-- Critical CSS - Load synchronously -->
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <!-- Non-critical CSS - Load asynchronously -->
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+  <!-- Fallback for browsers that don't support preload -->
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+
+  <!-- Fonts - Optimized loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Defer non-critical JavaScript -->
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <!-- Structured Data for Academic Papers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals",
+    "description": "Next-hour ERCOT electricity price forecasting across 13 model configurations, combining price history, load, weather, natural gas, nuclear outages, and GDELT news sentiment.",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Rohan Fozdar",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Knox College"
+        }
+      }
+    ],
+    "publisher": {
+      "@type": "Organization",
+      "name": "Knox College"
+    },
+    "url": "https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/",
+    "image": "https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/static/images/social_preview.png",
+    "keywords": ["electricity price forecasting", "ERCOT", "price spikes", "time series foundation models", "news sentiment", "gradient boosting"],
+    "abstract": "Electricity prices in ERCOT are heavy-tailed: most hours trade near $21/MWh while a small number of grid-stress hours reach the $9,000/MWh regulatory cap. This work asks whether multimodal signals, and news sentiment in particular, improve next-hour price forecasting in a market dominated by rare extreme events. Eight data sources are combined into an hourly matrix of 77,956 observations and 87 features spanning 2016 to 2024, and thirteen model configurations are benchmarked under one chronological split. A hybrid that feeds a zero-shot Chronos forecast into XGBoost performs best, reaching a mean absolute error of $12.13/MWh with 61.4% spike recall on the held-out 2024 test year.",
+    "isAccessibleForFree": true,
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Electricity price forecasting"
+      },
+      {
+        "@type": "Thing",
+        "name": "Time series foundation models"
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals</h1>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://github.com/rohanfozdar" target="_blank">Rohan Fozdar</a>
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">Knox College<br>Mathematics Capstone</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+
+                <!-- TODO: drop the capstone PDF in docs/static/pdfs/paper.pdf and swap this
+                     span for the commented-out link below it. -->
+                <span class="link-block">
+                  <button class="external-link button is-normal is-rounded is-dark" disabled
+                          title="The capstone paper is not posted yet" style="opacity:0.55;cursor:not-allowed;">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper (coming soon)</span>
+                  </button>
+                </span>
+                <!--
+                <span class="link-block">
+                  <a href="static/pdfs/paper.pdf" target="_blank"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                -->
+
+                <span class="link-block">
+                  <a href="https://github.com/rohanfozdar/Electricity-Spot-Price-Forecaster" target="_blank"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+
+                <!-- TODO: replace SCHOLAR_ID with your Google Scholar user id. -->
+                <span class="link-block">
+                  <a href="https://scholar.google.com/citations?user=SCHOLAR_ID" target="_blank"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-graduation-cap"></i>
+                    </span>
+                    <span>Scholar</span>
+                  </a>
+                </span>
+
+                <!-- TODO: replace with the email address you want listed publicly. -->
+                <span class="link-block">
+                  <a href="mailto:rfozdar@knox.edu"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-envelope"></i>
+                    </span>
+                    <span>Email</span>
+                  </a>
+                </span>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+<!-- Teaser -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/teaser.png" alt="ERCOT hub-average price through the 2024 test year, with the 114 spike hours above $200/MWh marked, and a one-week zoom on the annual peak of $4,981/MWh" width="100%"/>
+      <h2 class="subtitle has-text-centered">
+        The 2024 held-out test year. Most hours trade near the median of $21/MWh, but 114 hours
+        exceed $200/MWh and the annual peak reaches $4,981/MWh. Forecasting the average hour is
+        easy; the value is in the tail.
+      </h2>
+    </div>
+  </div>
+</section>
+<!-- End teaser -->
+
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Electricity prices in ERCOT, the Texas grid, are strongly heavy-tailed. Most hours trade
+            near a median of about $21/MWh, while a small number of grid-stress hours run toward the
+            $9,000/MWh regulatory cap, and renewable oversupply can push prices negative. The
+            economics of the market are therefore set by rare events rather than by typical
+            conditions.
+          </p>
+          <p>
+            This project asks whether multimodal signals, and news sentiment in particular, improve
+            next-hour forecasts of the ERCOT real-time hub-average price. Eight data sources, namely
+            real-time and day-ahead prices, system load, weather across five zones, natural gas
+            prices and storage, nuclear reactor outages, and GDELT news sentiment, are assembled
+            into an hourly matrix of 77,956 observations and 87 engineered features covering 2016
+            through 2024. Thirteen model configurations are benchmarked under one strictly
+            chronological split, spanning gradient-boosted trees, deep sequence models, zero-shot
+            time-series foundation models, classical statistical baselines, and hybrids of the two.
+          </p>
+          <p>
+            The strongest configuration is neither purely supervised nor purely zero-shot. Feeding a
+            frozen Chronos forecast into XGBoost as a single additional feature yields a mean
+            absolute error of $12.13/MWh and 61.4% spike recall on the held-out 2024 test year,
+            ahead of the best standalone supervised model at $13.75/MWh. Removing sentiment features
+            degrades accuracy, and the direction of that effect reproduces from this codebase,
+            though the published margin does not - a discrepancy documented rather than smoothed
+            over.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+
+<!-- Method -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">Method</h2>
+        <img src="static/images/architecture.png" alt="Architecture of the Chronos plus XGBoost hybrid: eight data sources feed an 87-feature hourly matrix, while a frozen Chronos T5-small model forecasts one hour ahead from a 512-hour window of raw prices; that forecast is appended as one column and XGBoost trains on the result" width="100%"/>
+        <div class="content has-text-justified" style="margin-top: 1.5rem;">
+          <p>
+            The hybrid keeps the two halves of the problem separate. <b>Chronos</b>
+            (<code>amazon/chronos-t5-small</code>) sees only the raw price series: a 512-hour context
+            window, from which it forecasts one hour ahead. It is never fine-tuned. That single
+            forecast is appended to the 87 engineered features as a column named
+            <code>chronos_pred</code>, and <b>XGBoost</b> trains on the 88-column result, learning
+            when the univariate forecast deserves trust and when weather, outage, gas, and sentiment
+            features should override it.
+          </p>
+          <p>
+            Every model shares one chronological split, with no shuffling: training on 2016 through
+            2022, validation on 2023, and testing on 2024. The test year contains 8,767 hours, of
+            which 114 exceed the $200/MWh spike threshold.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End method -->
+
+
+<!-- Results table -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">Results</h2>
+        <div class="content">
+          <p class="has-text-justified">
+            All metrics are computed on the held-out 2024 test year. Spike metrics use a threshold of
+            $200/MWh. These are the figures reported in the capstone paper.
+          </p>
+          <div class="table-container">
+          <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+              <tr>
+                <th>Rank</th><th>Model</th><th>Family</th>
+                <th class="has-text-right">MAE&nbsp;($/MWh)</th>
+                <th class="has-text-right">RMSE&nbsp;($/MWh)</th>
+                <th class="has-text-right">Spike recall</th>
+                <th class="has-text-right">Spike precision</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background-color:#fff4ed;">
+                <td>1</td><td><b>Chronos Hybrid</b></td><td>Hybrid</td>
+                <td class="has-text-right"><b>12.13</b></td><td class="has-text-right"><b>93.98</b></td>
+                <td class="has-text-right">61.40%</td><td class="has-text-right">50.43%</td>
+              </tr>
+              <tr>
+                <td>2</td><td><b>CatBoost</b></td><td>GBT</td>
+                <td class="has-text-right">13.75</td><td class="has-text-right">95.48</td>
+                <td class="has-text-right">44.35%</td><td class="has-text-right">56.94%</td>
+              </tr>
+              <tr>
+                <td>3</td><td>NGBoost</td><td>GBT</td>
+                <td class="has-text-right">14.59</td><td class="has-text-right">106.44</td>
+                <td class="has-text-right">25.44%</td><td class="has-text-right">59.18%</td>
+              </tr>
+              <tr>
+                <td>4</td><td>Chronos</td><td>Foundation</td>
+                <td class="has-text-right">14.72</td><td class="has-text-right">115.59</td>
+                <td class="has-text-right">42.11%</td><td class="has-text-right"><b>60.76%</b></td>
+              </tr>
+              <tr>
+                <td>5</td><td>SARIMAX</td><td>Classical</td>
+                <td class="has-text-right">18.45</td><td class="has-text-right">124.31</td>
+                <td class="has-text-right">45.61%</td><td class="has-text-right">38.81%</td>
+              </tr>
+              <tr>
+                <td>6</td><td>LightGBM</td><td>GBT</td>
+                <td class="has-text-right">19.76</td><td class="has-text-right">100.41</td>
+                <td class="has-text-right">34.21%</td><td class="has-text-right">45.35%</td>
+              </tr>
+              <tr>
+                <td>7</td><td>LSTM</td><td>Deep Learning</td>
+                <td class="has-text-right">24.42</td><td class="has-text-right">148.72</td>
+                <td class="has-text-right">16.67%</td><td class="has-text-right">23.46%</td>
+              </tr>
+              <tr>
+                <td>8</td><td>XGBoost</td><td>GBT</td>
+                <td class="has-text-right">24.43</td><td class="has-text-right">112.46</td>
+                <td class="has-text-right">57.02%</td><td class="has-text-right">25.10%</td>
+              </tr>
+              <tr>
+                <td>9</td><td>TimesFM</td><td>Foundation</td>
+                <td class="has-text-right">32.51</td><td class="has-text-right">136.94</td>
+                <td class="has-text-right">1.75%</td><td class="has-text-right">11.76%</td>
+              </tr>
+              <tr>
+                <td>10</td><td>XGBoost, no sentiment</td><td>Ablation</td>
+                <td class="has-text-right">34.53</td><td class="has-text-right">122.57</td>
+                <td class="has-text-right">50.53%</td><td class="has-text-right">19.54%</td>
+              </tr>
+              <tr>
+                <td>11</td><td>TFT</td><td>Deep Learning</td>
+                <td class="has-text-right">45.75</td><td class="has-text-right">134.60</td>
+                <td class="has-text-right">0.00%</td><td class="has-text-right">0.00%</td>
+              </tr>
+              <tr>
+                <td>12</td><td>Prophet Hybrid</td><td>Hybrid</td>
+                <td class="has-text-right">48.36</td><td class="has-text-right">108.96</td>
+                <td class="has-text-right"><b>71.05%</b></td><td class="has-text-right">14.16%</td>
+              </tr>
+              <tr>
+                <td>13</td><td>Prophet</td><td>Classical</td>
+                <td class="has-text-right">119.14</td><td class="has-text-right">168.75</td>
+                <td class="has-text-right">57.14%</td><td class="has-text-right">17.70%</td>
+              </tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End results table -->
+
+
+<!-- Image carousel -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item">
+          <img src="static/images/leaderboard_mae.png" alt="Horizontal bar chart of test MAE for all 13 model configurations, with the Chronos hybrid lowest at 12.13 dollars per MWh" loading="lazy"/>
+          <h2 class="subtitle has-text-centered">
+            Test MAE across all 13 configurations. The hybrid leads, and tree ensembles outperform
+            the deep sequence models on this dataset.
+          </h2>
+        </div>
+        <div class="item">
+          <img src="static/images/spike_tradeoff.png" alt="Scatter plot of spike precision against spike recall for each model, with iso-F1 contours" loading="lazy"/>
+          <h2 class="subtitle has-text-centered">
+            Spike detection is a tradeoff. Prophet Hybrid catches the most spikes but raises many
+            false alarms; Chronos is precise but misses more; the hybrid balances both.
+          </h2>
+        </div>
+        <div class="item">
+          <img src="static/images/sentiment_ablation.png" alt="Grouped bar chart comparing the paper's sentiment ablation with the re-run from this repository" loading="lazy"/>
+          <h2 class="subtitle has-text-centered">
+            The sentiment ablation, as published and as re-run from this repository. The direction
+            holds in both; the margin is 29.3% in the paper and 22.0% on re-run.
+          </h2>
+        </div>
+        <div class="item">
+          <img src="static/images/feature_importance.png" alt="Top 20 feature importances for the 87-feature model, with GDELT sentiment features highlighted" loading="lazy"/>
+          <h2 class="subtitle has-text-centered">
+            Top 20 features of the 87-feature model. GDELT news tone carries the largest single
+            share of gain importance, ahead of the one-hour price lag.
+          </h2>
+        </div>
+        <div class="item">
+          <img src="static/images/price_distribution.png" alt="Histogram of ERCOT hub-average prices from 2016 to 2024 on linear and logarithmic scales" loading="lazy"/>
+          <h2 class="subtitle has-text-centered">
+            Nine years of prices. 1,844 of 77,955 hours exceed $200/MWh, about 2.4% of the record,
+            with a maximum of $9,052/MWh.
+          </h2>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End image carousel -->
+
+
+<!-- Key findings -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <h2 class="title is-3 has-text-centered">Key Findings</h2>
+        <div class="content has-text-justified">
+          <ol>
+            <li>
+              <b>The best model is neither purely supervised nor purely zero-shot.</b> Chronos
+              contributes a univariate temporal forecast; XGBoost contributes the physical, market,
+              weather, outage, and sentiment context. Together they reach $12.13/MWh MAE, ahead of
+              either component alone.
+            </li>
+            <li>
+              <b>CatBoost is the strongest standalone model</b> at $13.75/MWh, and gradient-boosted
+              trees as a family handle ERCOT's nonlinear interactions better than the deep models
+              tested here.
+            </li>
+            <li>
+              <b>News sentiment carries signal.</b> GDELT tone is the highest-gain single feature in
+              the 87-feature model, and removing the sentiment family degrades MAE in every
+              configuration tested.
+            </li>
+            <li>
+              <b>Deep learning underperformed.</b> The LSTM is competitive on MAE but misses most
+              spikes, and the Temporal Fusion Transformer records zero spike recall on 2024. Spike
+              behaviour is rare and event-driven, which suits trees and hurts models that need many
+              examples of the phenomenon.
+            </li>
+            <li>
+              <b>Spike prediction is a tradeoff, not a single score.</b> Recall and precision trade
+              off sharply across models, so the useful question is which operating point a given
+              application needs.
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End key findings -->
+
+
+<!-- Reproducibility -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+        <h2 class="title is-3 has-text-centered">Reproducibility</h2>
+        <div class="content has-text-justified">
+          <p>
+            The repository ships the canonical feature matrix, so a fresh clone can train and
+            evaluate without re-pulling any primary source or holding any API key:
+          </p>
+          <pre><code>git clone https://github.com/rohanfozdar/Electricity-Spot-Price-Forecaster.git
+cd Electricity-Spot-Price-Forecaster
+pip install -e .
+python run_full_pipeline.py --stage models</code></pre>
+          <p>
+            Two caveats are stated plainly rather than buried. First, the published
+            <i>no-sentiment</i> ablation figure of $34.53/MWh does not regenerate from this
+            codebase: re-running it four ways, across two feature matrices with and without the
+            log1p transforms, puts that number between $22.17 and $24.58 every time. The
+            conclusion survives, since a like-for-like comparison still shows sentiment reducing
+            MAE by 22.0%, but the specific published pair should be read as the paper's record.
+            Second, the Chronos backfill required for the hybrid is roughly 77,400 forward passes
+            and has not yet been completed end-to-end on the machine used to prepare this
+            repository, so the headline $12.13/MWh is likewise the paper's record. The script that
+            reproduces it, <code>models/train_chronos_hybrid.py</code>, checkpoints and resumes.
+          </p>
+          <p>
+            Seven of the thirteen configurations, namely CatBoost, NGBoost, LSTM, TFT, TimesFM,
+            Prophet, and SARIMAX, were verified by code inspection rather than re-executed for this
+            release, and the runtime estimates in the repository README are approximate.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End reproducibility -->
+
+
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@misc{fozdar2026multimodal,
+  title  = {A Multimodal Framework for Electricity Price Forecasting Using
+            Sentiment-Augmented Time-Series Signals},
+  author = {Fozdar, Rohan},
+  year   = {2026},
+  note   = {Mathematics Capstone, Knox College},
+  url    = {https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/}
+}</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+  <footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  </main>
+  </body>
+  </html>
