@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+title: >-
+  A Multimodal Framework for Electricity Price Forecasting Using
+  Sentiment-Augmented Time-Series Signals
+message: If you use this software or its results, please cite it as below.
+type: software
+authors:
+  - given-names: Rohan
+    family-names: Fozdar
+    affiliation: Knox College
+abstract: >-
+  A forecasting framework for next-hour ERCOT real-time hub-average electricity
+  prices and for flagging price spikes above $200/MWh. Eight data sources,
+  spanning prices, system load, weather, natural gas, nuclear outages and GDELT
+  news sentiment, are combined into an hourly matrix of 77,956 observations and
+  87 engineered features covering 2016 to 2024. Thirteen model configurations
+  are benchmarked under one chronological split; a hybrid that feeds a frozen
+  Chronos forecast into XGBoost performs best, at $12.13/MWh mean absolute
+  error with 61.4% spike recall on the held-out 2024 test year.
+keywords:
+  - electricity price forecasting
+  - ERCOT
+  - price spikes
+  - time series foundation models
+  - news sentiment
+  - gradient boosting
+license: MIT
+repository-code: https://github.com/rohanfozdar/Electricity-Spot-Price-Forecaster
+url: https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/
+year: 2026

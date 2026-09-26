@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install the package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run tests
+        run: pytest -q
+        # The pipeline tests skip themselves when data/raw/ is absent, which is
+        # the case in a clean checkout.
+
+      - name: Stages that must work on a fresh clone
+        run: |
+          python run_full_pipeline.py --stage features
+          python run_full_pipeline.py --stage models
+
+      - name: Regenerate the figures
+        run: |
+          python figures/make_figures.py
+          for f in teaser leaderboard_mae spike_tradeoff price_distribution \
+                   sentiment_ablation architecture feature_importance social_preview; do
+            test -s "docs/static/images/$f.png" || { echo "missing $f.png"; exit 1; }
+          done
+        # PNGs are not byte-compared: they differ across matplotlib and freetype
+        # versions even when the underlying numbers are identical.
