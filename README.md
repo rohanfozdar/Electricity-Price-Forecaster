@@ -21,7 +21,7 @@ spikes above **$200/MWh**, using price history, system load, weather, natural ga
 and GDELT news sentiment.
 
 **[Project page](https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/)** &middot;
-Paper: coming soon
+**[Paper (PDF)](docs/static/pdfs/paper.pdf)**
 
 ---
 
@@ -65,7 +65,8 @@ This makes ERCOT forecasting less about predicting the average hour and more abo
 ## Results
 
 All metrics are reported on the held-out **2024 test set** (8,767 hours, 114 of them spike hours).
-Spike metrics use `HB_HUBAVG > $200/MWh`.
+Spike metrics use `HB_HUBAVG > $200/MWh`. The table is the results table from the capstone
+paper, pages 4–5 of [docs/static/pdfs/paper.pdf](docs/static/pdfs/paper.pdf).
 
 | Rank | Model                 | Family        |       MAE |      RMSE | Spike Recall | Spike Precision |
 | :--: | --------------------- | ------------- | --------: | --------: | -----------: | --------------: |
@@ -415,9 +416,9 @@ This repository supports the paper:
 **A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series
 Signals**
 
-The paper contains the full methodology, feature construction details, model descriptions, and
-discussion of results. It is not yet posted; when it is, the PDF will be linked from the
-[project page](https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/).
+The PDF is [docs/static/pdfs/paper.pdf](docs/static/pdfs/paper.pdf). The leaderboard above is that
+paper's results table, not a fresh re-run. The paper contains the full methodology, feature
+construction, model descriptions, and discussion.
 
 ## Citation
 
