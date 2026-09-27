@@ -72,7 +72,7 @@ sources:
   eia_storage:
     file: eia_storage.parquet
     rule: weekly_release
-    release_offset: 7d18h       # week ending Friday -> following Friday 18:00 UTC (Thursday 10:30 ET + holiday buffer)
+    release_offset: 7 days 18 hours   # week ending Friday -> following Friday 18:00 UTC (Thursday 10:30 ET + holiday buffer)
     verified: documented
 
   nrc_reactors:

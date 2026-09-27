@@ -16,6 +16,8 @@ dependencies = [
     "xgboost",
     "lightgbm",
     "statsmodels",
+    "scipy",
+    "pyyaml",
     # Visualization
     "matplotlib",
     "seaborn",
@@ -48,7 +50,12 @@ all = [
 ]
 
 [tool.setuptools]
-packages = ["pipelines", "utils", "models", "evaluation", "dashboard"]
+packages = ["pipelines", "utils", "models", "evaluation", "dashboard",
+            "src", "src.data", "src.features", "src.models", "src.evaluation"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
 
 [build-system]
 requires = ["setuptools>=64.0"]

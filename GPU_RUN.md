@@ -1,5 +1,7 @@
 # Running the Chronos hybrid on a GPU machine
 
+> **Historical.** This page reproduces the capstone's *next-hour* hybrid, which is trained on the v2 matrix. The audit (`reports/repository_audit.md`) found that matrix is not point-in-time safe. For the current early-warning experiment's GPU job, see [GPU_CHRONOS_T5.md](GPU_CHRONOS_T5.md).
+
 The Chronos + XGBoost hybrid is the headline result of this project and the only step that really
 wants a GPU. This page is the copy-paste version for a lab workstation or a cluster node.
 

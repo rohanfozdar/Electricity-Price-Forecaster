@@ -16,6 +16,9 @@ models/*.pkl
 models/*.json
 models/artifacts/
 
+# --- Early-warning run directories (summaries are copied to reports/results/) ---
+runs/
+
 # --- Data: ignore everything except the canonical engineered matrix ---
 data/raw/
 data/processed/
