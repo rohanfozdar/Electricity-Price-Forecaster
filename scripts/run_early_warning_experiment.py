@@ -1,4 +1,7 @@
-"""Run the frozen early-warning experiment end to end.
+"""Run the frozen early-warning experiment end to end (CPU only).
+
+Needs the Chronos caches in data/features/chronos/, produced on a GPU by
+scripts/run_chronos_caches.sh (see GPU_CHRONOS.md). This script never runs Chronos.
 
     python scripts/run_early_warning_experiment.py                 # everything
     python scripts/run_early_warning_experiment.py --export-chronos-input
@@ -52,20 +55,16 @@ def export_chronos_input() -> Path:
     return CHRONOS_INPUT
 
 
-def ensure_cache(variant: str, context: int) -> Path | None:
+def find_cache(variant: str, context: int, required: bool = False) -> Path | None:
+    """Chronos caches are produced on a GPU machine (GPU_CHRONOS.md); this runner never generates them."""
     path = CHRONOS_DIR / f"{variant}_ctx{context}.npz"
     if path.exists():
         return path
-    if not variant.startswith("bolt"):
-        log(f"  {path.name} not found (GPU hand-off); skipping")
-        return None
-    if not CHRONOS_INPUT.exists():
-        export_chronos_input()
-    log(f"  generating {path.name}")
-    subprocess.run([sys.executable, str(ROOT / "scripts" / "run_chronos_cache.py"), "--variant", variant,
-                    "--context", str(context), "--input", str(CHRONOS_INPUT), "--out", str(path)],
-                   check=True, cwd=ROOT)
-    return path
+    if required:
+        sys.exit(f"missing {path}: generate it on a GPU with "
+                 f"scripts/run_chronos_caches.sh (see GPU_CHRONOS.md), then rerun")
+    log(f"  {path.name} not found; skipping that sensitivity row")
+    return None
 
 
 def git_commit() -> str:
@@ -96,14 +95,15 @@ def main() -> None:
     ch_cfg = cfg["chronos"]
     variant_of = {"amazon/chronos-bolt-small": "bolt-small", "amazon/chronos-bolt-base": "bolt-base",
                   "amazon/chronos-t5-small": "t5-small"}
-    primary_cache = ensure_cache(variant_of[ch_cfg["primary"]["checkpoint"]], ch_cfg["primary"]["context_hours"])
+    primary_cache = find_cache(variant_of[ch_cfg["primary"]["checkpoint"]], ch_cfg["primary"]["context_hours"],
+                               required=True)
     sens_caches = []
     if not args.no_sensitivity:
         for s in ch_cfg["sensitivity"]:
-            p = ensure_cache(variant_of[s["checkpoint"]], s["context_hours"])
+            p = find_cache(variant_of[s["checkpoint"]], s["context_hours"])
             if p:
                 sens_caches.append(p)
-        t5 = ensure_cache("t5-small", ch_cfg["gpu_handoff"]["context_hours"])
+        t5 = find_cache("t5-small", ch_cfg["gpu_handoff"]["context_hours"])
         if t5:
             sens_caches.append(t5)
 
@@ -117,11 +117,11 @@ def main() -> None:
     run_id = stable_hash({k: v for k, v in manifest.items() if k != "git_commit"})
     out = args.out_root / run_id
     (out / "figures").mkdir(parents=True, exist_ok=True)
-    import numpy, sklearn, xgboost, torch  # noqa: F401,E401
+    import numpy, sklearn, xgboost  # noqa: F401,E401
     manifest.update({"run_id": run_id, "started": time.strftime("%Y-%m-%dT%H:%M:%S"),
                      "python": platform.python_version(), "pandas": pd.__version__,
                      "numpy": numpy.__version__, "sklearn": sklearn.__version__,
-                     "xgboost": xgboost.__version__, "torch": torch.__version__})
+                     "xgboost": xgboost.__version__})
     log(f"run {run_id} -> {out}")
 
     t0 = time.time()
