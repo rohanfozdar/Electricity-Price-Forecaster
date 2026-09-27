@@ -1,0 +1,122 @@
+# Frozen design for the ERCOT multi-horizon spike early-warning experiment (Gate B).
+# Any change after the first Gate D run must be logged in reports/experiment_design.md
+# under "Deviations", with the reason and the date.
+
+experiment_name: ercot_early_warning_v1
+frozen_on: "2026-09-26"
+seed: 0
+
+data:
+  raw_dir: data/raw
+  availability: configs/feature_availability.yaml
+  target_series: HB_HUBAVG            # ERCOT hub average, real-time 15-minute SPP
+  hourly_aggregation: max             # y[h] = max of the four 15-min SPPs in [h, h+1); hours with <4 intervals are missing
+  timezone_calendar: US/Central       # calendar features use local prevailing time
+
+origins:
+  every_hours: 6                      # issue times 00, 06, 12, 18 UTC
+  start: "2016-02-01T00:00Z"          # after the 720-hour warm-up
+  end_rule: last origin with a complete label window
+
+target:
+  horizons_hours: [24, 48, 72, 96, 120, 144]
+  window: "[t, t+H-1] in hour-beginning index = real time (t, t+H]"
+  primary_threshold: 200.0
+  sensitivity_thresholds: [100.0, 500.0, train_p99]
+  incomplete_window: drop             # never labelled 0
+  event_merge_gap_hours: 6
+  sensitivity_event_merge_gap_hours: [12]
+
+folds:                                # expanding window, purged: a row belongs to a split only if its whole label window does
+  - name: test2023
+    train_end: "2022-01-01"
+    val: ["2022-01-01", "2023-01-01"]
+    test: ["2023-01-01", "2024-01-01"]
+  - name: test2024
+    train_end: "2023-01-01"
+    val: ["2023-01-01", "2024-01-01"]
+    test: ["2024-01-01", "2025-01-01"]
+
+experiments:
+  point_in_time:                      # primary; every feature is available at issue time
+    period: [2016, 2024]
+    folds: [test2023, test2024]
+  forecast_weather:                   # operational weather forecasts (GFS 2 m temperature, Previous Runs API)
+    period_start: "2021-03-30"
+    folds: [test2024]
+  oracle_weather:                     # realized weather over the label window: an upper bound, never an operational claim
+    period: [2016, 2024]
+    folds: [test2023, test2024]
+
+feature_sets:
+  price: [price_history, calendar]
+  structured: [price_history, calendar, day_ahead, load, weather_obs, fundamentals]
+  structured_news: [price_history, calendar, day_ahead, load, weather_obs, fundamentals, news]
+  structured_news_wxfc: [price_history, calendar, day_ahead, load, weather_obs, fundamentals, news, weather_forecast]
+  structured_news_oracle: [price_history, calendar, day_ahead, load, weather_obs, fundamentals, news, weather_oracle]
+
+chronos:
+  primary:
+    checkpoint: amazon/chronos-bolt-small
+    kind: quantile                    # deterministic; quantile levels 0.1..0.9
+    context_hours: 512
+    prediction_length: 144
+  gpu_handoff:
+    checkpoint: amazon/chronos-t5-small
+    kind: samples
+    num_samples: 20
+    context_hours: 512
+    prediction_length: 144
+    seed: 0
+  sensitivity:
+    - {checkpoint: amazon/chronos-bolt-small, context_hours: 256}
+    - {checkpoint: amazon/chronos-bolt-small, context_hours: 1024}
+    - {checkpoint: amazon/chronos-bolt-base, context_hours: 512}
+  missing_context: NaN                # gaps passed as NaN; no positional stitching
+
+models:
+  baselines: [prevalence, persistence_max24h, seasonal_naive_168h, day_ahead_max, logistic_structured]
+  xgboost: [XGB_price, XGB_structured, XGB_structured_news]
+  chronos: [Chronos_only, Chronos_XGB_price, Chronos_XGB_structured, Chronos_XGB_full, Blend_full]
+  forecast_weather_extra: [XGB_structured_news_wxfc, Chronos_XGB_full_wxfc]
+  oracle_extra: [XGB_structured_news_oracle, Chronos_XGB_full_oracle]
+
+xgboost:
+  fixed: {learning_rate: 0.05, subsample: 0.8, colsample_bytree: 0.8, reg_lambda: 1.0,
+          n_estimators: 1000, early_stopping_rounds: 50, eval_metric: logloss, tree_method: hist}
+  grid:
+    max_depth: [3, 6]
+    min_child_weight: [1, 10]
+    scale_pos_weight: [1, sqrt_neg_pos]
+  selection_metric: val_average_precision
+  missing: native                     # NaN passed through; no zero fill
+
+logistic:
+  C_grid: [0.01, 0.1, 1.0]
+  imputation: train_median_plus_indicator
+  scaling: train_standardize
+
+calibration:
+  method: platt                       # sigmoid fit on validation predictions of the selected model
+  fit_on: val
+
+alert_rule:
+  primary: max_val_f1                 # threshold maximizing origin-level F1 on calibrated validation probabilities
+  lead_time_min_hours: 0
+
+metrics:
+  probabilistic: [average_precision, roc_auc, brier, log_loss, ece_10_quantile_bins]
+  operating_point: [precision, recall, f1, alerts_per_30d]
+  event: [event_recall, event_recall_lead_ge_12h, median_lead_hours, event_precision, false_alert_episodes_per_30d, missed_events]
+  regression_secondary: [mae, rmse, mae_hours_gt_200_descriptive, pinball_q10_q50_q90]
+
+statistics:
+  primary_hypothesis: >
+    At H = 48 h in the point-in-time experiment, pooled over the 2023 and 2024 test years,
+    Chronos_XGB_full has higher average precision than BOTH XGB_structured_news and Chronos_only.
+  primary_test: paired moving-block bootstrap of the AP difference; claim requires both 95% CIs to exclude 0
+  block_length_origins: 28            # 7 days
+  bootstrap_resamples: 2000
+  secondary: Diebold-Mariano on Brier-loss differentials, HAC lag = H/6 origins, HLN correction
+  multiplicity: Holm over the 10 secondary comparisons (5 other horizons x 2 comparators), alpha 0.05
+  robustness_seeds: [1, 2, 3, 4]
