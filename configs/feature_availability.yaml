@@ -1,0 +1,86 @@
+# Point-in-time availability rules, one entry per raw source.
+#
+# Timestamps in data/raw are UTC. For an issue time t (top of an hour, UTC), a
+# source row stamped `ts` may be used only if available_at(ts) <= t, where
+# available_at is defined by `rule`:
+#
+#   interval_end_plus    available_at = ts + interval + delay
+#   dam_publication      operating day D (Central) available at D-1 publish_local (Central)
+#   daily_next_utc_day   available_at = floor_day(ts) + 1 day + delay
+#   weekly_release       available_at = ts (period end) + release_offset
+#   eia_weekly_spot      trade date D available on the first release_weekday on or
+#                        after D + min_days, at release_time_utc
+#
+# `verified` records whether the timing is documented or assumed.
+
+sources:
+  ercot_rt_prices:
+    file: ercot_rt_prices.parquet
+    rule: interval_end_plus
+    interval: 15min
+    delay: 0min
+    verified: documented        # ERCOT posts RTM SPPs within minutes of each interval
+    notes: hourly target y[h] = max of the four 15-min SPPs in [h, h+1); y[h] usable from h+1.
+
+  ercot_da_prices:
+    file: ercot_da_prices.parquet
+    rule: dam_publication
+    publish_local: "14:00"      # DAM results ~13:30 Central, 30 min buffer
+    timezone: US/Central
+    verified: documented
+
+  ercot_load:
+    file: ercot_load.parquet
+    rule: interval_end_plus
+    interval: 1h
+    delay: 0min
+    verified: assumed           # real-time system demand is posted continuously
+    coverage_start: "2019-01-01"
+
+  weather_obs:
+    file: weather.parquet
+    rule: interval_end_plus
+    interval: 1h
+    delay: 0min
+    verified: assumed           # reanalysis used as a proxy for real-time station observations
+    sensitivity_delay: 120h     # ERA5 publication delay (Open-Meteo docs: "daily with 5 days delay")
+
+  weather_forecast_gfs:
+    file: weather_forecast_gfs.parquet
+    rule: lead_day
+    run_delay: 6h               # lead day N used for valid hour h iff h - t + run_delay <= 24*N
+    max_lead_days: 7
+    coverage_start: "2021-03-23"
+    verified: documented        # Open-Meteo Previous Runs API
+
+  gdelt:
+    file: gdelt.parquet
+    rule: daily_next_utc_day
+    delay: 1h
+    verified: documented        # DOC API timelines aggregate by UTC day
+    caveat: retrospective query; article set may differ from what was indexed in real time
+    coverage_start: "2017-02-01"
+
+  eia_gas:
+    file: eia_gas.parquet
+    rule: eia_weekly_spot
+    min_days: 5
+    release_weekday: 2          # Wednesday
+    release_time_utc: "17:00"
+    verified: assumed           # conservative; EIA posts daily spot prices in weekly batches
+
+  eia_storage:
+    file: eia_storage.parquet
+    rule: weekly_release
+    release_offset: 7d18h       # week ending Friday -> following Friday 18:00 UTC (Thursday 10:30 ET + holiday buffer)
+    verified: documented
+
+  nrc_reactors:
+    file: nrc_reactors.parquet
+    rule: daily_next_utc_day
+    delay: 0h
+    verified: assumed           # report posted the morning of the report date (ET); next UTC day is conservative
+
+  google_trends:
+    excluded: true
+    reason: unused by any model; weekly index with unclear release semantics
