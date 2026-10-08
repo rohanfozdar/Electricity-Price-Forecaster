@@ -7,10 +7,10 @@ clone can regenerate the whole set:
     data/features/feature_matrix_engineered_v2.parquet   the canonical matrix
     models/artifacts/*_feature_importance.csv            optional, see below
 
-The leaderboard numbers are the published capstone results and are held here as
-a literal table (PAPER_LEADERBOARD). They are the paper's record, not a live
-re-run, and must not be edited to match a re-run - see the Reproducibility
-section of the README.
+PAPER_LEADERBOARD is the consolidated capstone comparison, including the
+unmatched no-sentiment row. It is not the matched GDELT ablation in
+notebooks/01_xgboost.ipynb (MAE 24.64 without GDELT, 22.21 with GDELT).
+Do not edit the table to match a later re-run.
 
 Output goes to docs/static/images/, which the project page and README both read.
 
@@ -65,10 +65,6 @@ PAPER_LEADERBOARD = [
     ("Prophet Hybrid",       "Hybrid",         48.36,  108.96,  0.7105, 0.1416),
     ("Prophet",              "Classical",     119.14,  168.75,  0.5714, 0.1770),
 ]
-
-# Fallbacks for the sentiment ablation re-run, used when model artifacts are
-# absent. These match models/artifacts/{baseline,enhanced}_v2_report.json.
-RERUN_FALLBACK = {"baseline_v2": (24.58, 117.76), "enhanced_v2": (19.17, 108.59)}
 
 HIGHLIGHT = "#c2410c"
 PRIMARY = "#1f4e79"
@@ -199,7 +195,7 @@ def fig_leaderboard() -> None:
     best.set_linewidth(1.3)
     ax.set_xlim(0, max(maes) * 1.13)
     ax.set_xlabel("Test MAE ($/MWh), 2024 - lower is better")
-    ax.set_title("Chronos + XGBoost hybrid leads all 13 configurations")
+    ax.set_title("Consolidated capstone comparison: reported test MAE")
     ax.grid(axis="y", visible=False)
 
     # The top rows are the short bars, so the upper right is the only free space.
@@ -300,53 +296,30 @@ def fig_price_distribution(mat: pd.DataFrame) -> None:
     save(fig, "price_distribution.png")
 
 
-def _rerun_metrics() -> dict:
-    """Test MAE/RMSE for the ablation pair, from artifacts when available."""
-    out = {}
-    for key, fallback in RERUN_FALLBACK.items():
-        report = ARTIFACTS / "{}_report.json".format(key)
-        if report.exists():
-            import json
-            test = json.loads(report.read_text())["test"]
-            out[key] = (test["mae"], test["rmse"])
-        else:
-            out[key] = fallback
-    return out
-
-
 def fig_sentiment_ablation() -> None:
-    """The paper's ablation beside the re-run, without hiding the gap."""
-    rerun = _rerun_metrics()
-    paper = {"no_sentiment": 34.53, "with_sentiment": 24.43}
-    live = {"no_sentiment": rerun["baseline_v2"][0], "with_sentiment": rerun["enhanced_v2"][0]}
+    """Matched notebook ablation. Other historical pairs are labeled, not mixed in."""
+    matched = {"without": 24.64, "with": 22.21}
 
-    fig, ax = plt.subplots(figsize=(8.6, 4.8))
+    fig, ax = plt.subplots(figsize=(8.2, 4.8))
     x = np.arange(2)
-    width = 0.34
-
-    b1 = ax.bar(x - width / 2, [paper["no_sentiment"], paper["with_sentiment"]],
-                width, color=MUTED, label="Paper record")
-    b2 = ax.bar(x + width / 2, [live["no_sentiment"], live["with_sentiment"]],
-                width, color=PRIMARY, label="Re-run from this repo")
-
-    for bars in (b1, b2):
-        for bar in bars:
-            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.5,
-                    "{:.2f}".format(bar.get_height()), ha="center", fontsize=9.5,
-                    color="#475569")
+    bars = ax.bar(x, [matched["without"], matched["with"]],
+                  width=0.55, color=[MUTED, PRIMARY])
+    for bar in bars:
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.35,
+                "{:.2f}".format(bar.get_height()), ha="center", fontsize=10,
+                color="#475569")
 
     ax.set_xticks(x)
-    ax.set_xticklabels(["Without sentiment\n(52 features)", "With sentiment\n(87 features)"])
+    ax.set_xticklabels(["Without GDELT", "With GDELT"])
     ax.set_ylabel("Test MAE ($/MWh)")
-    ax.set_ylim(0, 48)
-    ax.set_title("News sentiment helps, though the published margin does not reproduce")
-    ax.legend(fontsize=9.5, loc="upper right")
-
-    live_gain = 100 * (1 - live["with_sentiment"] / live["no_sentiment"])
-    ax.text(0.015, 0.96,
-            "Paper: 29.3% lower MAE\nRe-run: {:.1f}% lower MAE\nSame direction, smaller margin.".format(
-                live_gain),
-            transform=ax.transAxes, va="top", fontsize=9.5, color="#475569")
+    ax.set_ylim(0, 40)
+    ax.set_title("Matched XGBoost ablation, notebooks/01_xgboost.ipynb")
+    ax.text(0.02, 0.96,
+            "MAE falls 9.9%.\n"
+            "Other runs, not this ablation:\n"
+            "capstone row 34.53 to 24.43;\n"
+            "script re-run 24.58 to 19.17.",
+            transform=ax.transAxes, va="top", fontsize=9, color="#475569")
     ax.grid(axis="x", visible=False)
     save(fig, "sentiment_ablation.png")
 
@@ -396,7 +369,7 @@ def fig_architecture() -> None:
          "#e0f2fe", PRIMARY, fontsize=9.5)
 
     _box(ax, (0.785, 0.40), 0.20, 0.25,
-         "XGBoost\n500 trees, depth 6\nlr 0.05\n\nnext-hour price\n+ spike flag",
+         "XGBoost\n500 trees, depth 6\nlr 0.05\n\nhourly price\n+ spike flag",
          "#ffedd5", HIGHLIGHT, fontsize=9.3, weight="bold")
 
     _arrow(ax, (0.215, 0.765), (0.275, 0.765))
@@ -463,8 +436,8 @@ def fig_social_preview(mat: pd.DataFrame) -> None:
     ax.text(0.06, 0.60, "Rohan Fozdar   |   Knox College   |   Mathematics Capstone",
             fontsize=13.5, color="#cbd5e1", va="top")
     ax.text(0.06, 0.48,
-            "Next-hour ERCOT price forecasting across 13 model configurations, "
-            "2016-2024\nBest MAE $12.13/MWh - Chronos + XGBoost hybrid",
+            "Retrospective ERCOT price estimation, 2016-2024\n"
+            "Consolidated benchmark reports Chronos + XGBoost at MAE $12.13/MWh",
             fontsize=13, color="#e2e8f0", va="top", linespacing=1.6)
     # Exactly 1200x630, the size declared in the page's Open Graph tags.
     save(fig, "social_preview.png", tight=False, dpi=100)

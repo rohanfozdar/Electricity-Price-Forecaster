@@ -133,7 +133,7 @@ def regression_report(y_true, y_pred, name: str = "") -> dict:
 def apply_feature_transforms(df: pd.DataFrame) -> pd.DataFrame:
     """
     Apply log1p / binary transforms to known-skewed feature families.
-    Mirrors the transforms validated in notebooks/11_residual_diagnostics.ipynb.
+    Mirrors the transforms validated in notebooks/residual_diagnostics.ipynb.
     Pure: returns a new DataFrame, does not mutate the input.
     Columns not matching any filter pass through unchanged.
     """

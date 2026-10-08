@@ -93,4 +93,4 @@ The primary Chronos variant is therefore Chronos-Bolt-small. It is deterministic
 
 ## Deviations
 
-None yet.
+XGBoost fits read `ERCOT_XGB_DEVICE`. On the GPU server that variable is `cuda`; `tree_method` stays `hist` and the grid is unchanged. Logistic regression, Platt calibration, and the bootstrap run on CPU in the same job. Chronos is still the zero-shot cache, not retrained.

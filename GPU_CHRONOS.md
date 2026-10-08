@@ -25,7 +25,7 @@ pip install "chronos-forecasting>=2.0" pandas pyarrow numpy
 python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
 ```
 
-If you are inside a Jupyter notebook where `pip install --user` fails (as happened in `notebooks/10_chronos (1).ipynb`), use a target folder instead:
+If you are inside a Jupyter notebook where `pip install --user` fails (as happened in `notebooks/07_chronos_and_hybrid.ipynb`), use a target folder instead:
 
 ```python
 import sys; !{sys.executable} -m pip install chronos-forecasting --target=/tmp/chronos_pkg
@@ -70,15 +70,8 @@ source ~/chronos-env/bin/activate
 bash scripts/run_chronos_caches.sh
 ```
 
-## Afterwards (CPU)
+## Afterwards (same GPU server)
 
-Copy the five `.npz` files (about 60 MB each) into `data/features/chronos/` in the repository. Then:
-
-```bash
-pip install -e .                                   # CPU dependencies only; no torch needed
-pytest -q                                          # 37 leakage/target/split/alignment tests
-python scripts/run_early_warning_experiment.py --no-sensitivity --horizons 24 48   # quick check, writes runs/<hash>/summary
-python scripts/run_early_warning_experiment.py     # full frozen run; design estimate about 1 hour on a 10-core laptop
-```
+Upload the repository, including `data/raw/`, and open `notebooks/run_experiment_gpu.ipynb`. Restart the kernel and Run All. The notebook finds the repository root, copies the five `.npz` files into `data/features/chronos/`, and runs training and evaluation there. XGBoost uses CUDA. Logistic regression and the bootstrap use the server's CPUs in the same job. The cache builder for a Jupyter session without a terminal is `scripts/run_chronos_gpu.py`, next to `scripts/run_chronos_cache.py`.
 
 The full run writes `runs/<hash>/` (predictions, per-model metadata, metrics, CIs, tests, figures, manifest) and copies the summaries to `reports/results/`. The `meta` field inside each `.npz` records the checkpoint, seed, device, library versions and runtime, and the run manifest hashes every cache, so the results stay traceable.

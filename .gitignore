@@ -19,6 +19,9 @@ models/artifacts/
 # --- Early-warning run directories (summaries are copied to reports/results/) ---
 runs/
 
+# --- Local copies of trained artifacts. The write-ups in reports/ are the durable record. ---
+reports/paper_snapshot/
+
 # --- Data: ignore everything except the canonical engineered matrix ---
 data/raw/
 data/processed/
@@ -27,11 +30,11 @@ data/features/*
 !data/features/feature_matrix_engineered_v2.parquet
 
 # --- Notebooks intentionally excluded from the public repo ---
-# (diagnostics, TimesFM-hybrid, and the retrieval-augmented experiment)
-notebooks/01_data_inspection.ipynb
-notebooks/03_build_raw_matrix.ipynb
-notebooks/04_build_engineered_matrix.ipynb
-notebooks/11_residual_diagnostics (1).ipynb
-notebooks/15_timesfm_xgboost_augmented.ipynb
-notebooks/17_feature_diagnostics.ipynb
-notebooks/18_rag_forecaster.ipynb
+# (data construction, diagnostics, TimesFM hybrid, retrieval experiment)
+notebooks/data_inspection.ipynb
+notebooks/build_raw_matrix.ipynb
+notebooks/build_engineered_matrix.ipynb
+notebooks/residual_diagnostics.ipynb
+notebooks/timesfm_xgboost.ipynb
+notebooks/feature_diagnostics.ipynb
+notebooks/rag_forecaster.ipynb

@@ -1,7 +1,7 @@
 [project]
 name = "ercot-grid-forecaster"
 version = "0.1.0"
-description = "ML system for forecasting ERCOT electricity spot prices using weather, supply-side, and public sentiment signals."
+description = "Multimodal benchmark for retrospective ERCOT electricity-price estimation and spike detection."
 requires-python = ">=3.9"
 dependencies = [
     # Core data

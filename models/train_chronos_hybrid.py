@@ -1,10 +1,11 @@
 """
-Chronos + XGBoost hybrid - the best-performing model in this project.
+Chronos + XGBoost late fusion.
 
-Amazon's pretrained Chronos foundation model produces a one-hour-ahead
-forecast from the raw HB_HUBAVG history alone. That single forecast is then
-appended as one extra column to the 87 engineered features, and XGBoost is
-trained on the augmented matrix:
+Amazon's pretrained Chronos model produces a one-step forecast from the raw
+HB_HUBAVG history alone. That forecast is appended as one extra column to the
+87 engineered features, and XGBoost is trained on the augmented matrix.
+Same-hour covariates in that matrix mean the hybrid is part of the
+retrospective benchmark, not a point-in-time next-hour forecast.
 
     Raw price series --> Chronos (512h context) --> chronos_pred
                                                         |
@@ -12,8 +13,9 @@ trained on the augmented matrix:
                                                         v
                         XGBoost([87 features + chronos_pred] -> price)
 
-This is a script form of notebooks/10_chronos (1).ipynb, so the headline
-result is reproducible without opening a notebook.
+This is a script form of the hybrid section in
+notebooks/07_chronos_and_hybrid.ipynb. Those notebook cells were not executed;
+this script is the runnable form of the same design.
 
 RUNTIME WARNING
 ---------------
@@ -67,10 +69,16 @@ MODELS_DIR = Path("models/artifacts")
 V2_MATRIX = FEATURES_DIR / "feature_matrix_engineered_v2.parquet"
 CHRONOS_PRED_PATH = FEATURES_DIR / "chronos_pred.parquet"
 
-# Match notebooks/10_chronos (1).ipynb exactly.
+# Match notebooks/07_chronos_and_hybrid.ipynb exactly.
 CONTEXT_LENGTH = 512
 PREDICTION_LENGTH = 1
 MODEL_NAME = "amazon/chronos-t5-small"
+SPIKE_PRICE = 200.0
+
+# chronos_pred is the median sample path, as in the notebook. The other columns
+# summarise the same samples and are never read by the faithful hybrid.
+CHECKPOINT_COLUMNS = ["chronos_pred", "chronos_q10", "chronos_q90",
+                      "chronos_mean", "chronos_p_gt200"]
 
 
 def resolve_device(requested: str = "auto") -> tuple[str, "object"]:
@@ -103,7 +111,8 @@ def _release(device: str) -> None:
 
 
 def backfill_chronos(target_series: pd.Series, device: str, batch_size: int,
-                     checkpoint_every: int, limit: int | None) -> pd.Series:
+                     checkpoint_every: int, limit: int | None,
+                     seed: int = 0) -> pd.DataFrame:
     """One-hour-ahead Chronos forecast for every position with 512h of history.
 
     Resumes from CHRONOS_PRED_PATH if it exists, so a killed run costs only
@@ -118,9 +127,10 @@ def backfill_chronos(target_series: pd.Series, device: str, batch_size: int,
         def tqdm(x, **kwargs):
             return x
 
-    done = pd.Series(dtype="float64")
+    torch.manual_seed(seed)
+    done = pd.DataFrame(columns=CHECKPOINT_COLUMNS, dtype="float64")
     if CHRONOS_PRED_PATH.exists():
-        done = pd.read_parquet(CHRONOS_PRED_PATH)["chronos_pred"]
+        done = pd.read_parquet(CHRONOS_PRED_PATH).reindex(columns=CHECKPOINT_COLUMNS)
         print(f"  Resuming: {len(done):,} predictions already checkpointed")
 
     positions = np.arange(CONTEXT_LENGTH, len(target_series))
@@ -143,7 +153,7 @@ def backfill_chronos(target_series: pd.Series, device: str, batch_size: int,
         MODEL_NAME, device_map=device, torch_dtype=dtype,
     )
 
-    values, index = [], []
+    rows, index = [], []
     n_batches = 0
     for start in tqdm(range(0, len(positions), batch_size), desc="Chronos backfill"):
         batch_positions = positions[start:start + batch_size]
@@ -159,7 +169,7 @@ def backfill_chronos(target_series: pd.Series, device: str, batch_size: int,
                 samples = pipe.predict(contexts, prediction_length=PREDICTION_LENGTH)
         except RuntimeError as e:
             if "out of memory" in str(e).lower():
-                _checkpoint(done, values, index)
+                _checkpoint(done, rows, index)
                 raise SystemExit(
                     f"Out of memory at batch size {batch_size}. Progress was checkpointed to\n"
                     f"  {CHRONOS_PRED_PATH}\n"
@@ -172,27 +182,30 @@ def backfill_chronos(target_series: pd.Series, device: str, batch_size: int,
                 f"Expected Chronos shape (batch, samples, horizon), got {tuple(samples.shape)}"
             )
         # Median over sample paths at the 1-hour horizon.
-        median = samples[:, :, 0].median(dim=1).values.detach().cpu().numpy()
-        values.extend(median.tolist())
+        paths = samples[:, :, 0].detach().float().cpu()
+        median = paths.median(dim=1).values
+        q10, q90 = torch.quantile(paths, torch.tensor([0.1, 0.9]), dim=1)
+        stats = torch.stack([median, q10, q90, paths.mean(dim=1),
+                             (paths > SPIKE_PRICE).float().mean(dim=1)], dim=1)
+        rows.extend(stats.numpy().tolist())
         index.extend(target_series.index[batch_positions])
-        del samples, contexts
+        del samples, contexts, paths
         _release(device)
 
         n_batches += 1
         if n_batches % checkpoint_every == 0:
-            _checkpoint(done, values, index)
+            _checkpoint(done, rows, index)
 
-    return _checkpoint(done, values, index)
+    return _checkpoint(done, rows, index)
 
 
-def _checkpoint(done: pd.Series, values: list, index: list) -> pd.Series:
+def _checkpoint(done: pd.DataFrame, rows: list, index: list) -> pd.DataFrame:
     """Merge new predictions into the checkpoint file and return the union."""
-    fresh = pd.Series(values, index=pd.DatetimeIndex(index), name="chronos_pred")
+    fresh = pd.DataFrame(rows, index=pd.DatetimeIndex(index), columns=CHECKPOINT_COLUMNS)
     merged = pd.concat([done, fresh]) if len(done) else fresh
     merged = merged[~merged.index.duplicated(keep="last")].sort_index()
-    merged.name = "chronos_pred"
     CHRONOS_PRED_PATH.parent.mkdir(parents=True, exist_ok=True)
-    merged.to_frame().to_parquet(CHRONOS_PRED_PATH)
+    merged.to_parquet(CHRONOS_PRED_PATH)
     return merged
 
 
@@ -236,14 +249,30 @@ def train_hybrid(mat: pd.DataFrame, features: list[str],
     model.fit(X_train, train[TARGET_REG],
               eval_set=[(X_val, val[TARGET_REG])], verbose=False)
 
+    from sklearn.metrics import average_precision_score
+
+    val_pred = model.predict(X_val)
+    test_pred = model.predict(X_test)
     reports = {
         "train": regression_report(train[TARGET_REG].values, model.predict(X_train),
                                    "chronos-hybrid-train"),
-        "val": regression_report(val[TARGET_REG].values, model.predict(X_val),
+        "val": regression_report(val[TARGET_REG].values, val_pred,
                                  "chronos-hybrid-val"),
-        "test": regression_report(test[TARGET_REG].values, model.predict(X_test),
+        "test": regression_report(test[TARGET_REG].values, test_pred,
                                   "chronos-hybrid-test"),
     }
+    for split, part, pred in (("val", val, val_pred), ("test", test, test_pred)):
+        reports[split]["spike_pr_auc"] = float(average_precision_score(
+            part[TARGET_REG].values > SPIKE_PRICE, pred))
+    print(f"  Test spike PR-AUC (regressor as score): {reports['test']['spike_pr_auc']:.3f}")
+
+    MODELS_DIR.mkdir(parents=True, exist_ok=True)
+    pd.concat([
+        pd.DataFrame({"split": "val", "y_true": val[TARGET_REG].values, "y_pred": val_pred},
+                     index=val.index),
+        pd.DataFrame({"split": "test", "y_true": test[TARGET_REG].values, "y_pred": test_pred},
+                     index=test.index),
+    ]).to_parquet(MODELS_DIR / "chronos_hybrid_predictions.parquet")
 
     importance = pd.Series(model.feature_importances_, index=features_aug)\
                    .sort_values(ascending=False)
@@ -277,6 +306,9 @@ def main():
                     help="Write the checkpoint every N batches (default: 20)")
     ap.add_argument("--skip-backfill", action="store_true",
                     help="Reuse the existing checkpoint and only train XGBoost")
+    ap.add_argument("--seed", type=int, default=0,
+                    help="torch seed for Chronos sample paths (default: 0). "
+                         "XGBoost keeps the notebook's random_state=42.")
     args = ap.parse_args()
 
     if not V2_MATRIX.exists():
@@ -308,7 +340,8 @@ def main():
         print(f"\n--- Chronos backfill ({MODEL_NAME}, device={device}) ---")
         chronos_pred = backfill_chronos(
             target_series, device, args.batch_size, args.checkpoint_every, args.limit,
-        )
+            seed=args.seed,
+        )["chronos_pred"]
         print(f"  Checkpoint written: {CHRONOS_PRED_PATH} ({len(chronos_pred):,} rows)")
 
     expected = len(target_series) - CONTEXT_LENGTH

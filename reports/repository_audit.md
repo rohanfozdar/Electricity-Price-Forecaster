@@ -1,13 +1,14 @@
 # Repository audit (Gate A)
 
 Branch: `early-warning`, cut from `main` at `cf06362`. Audit date: 2026-09-26.
+Notebook filenames below were updated on 2026-10-07 after the experiment notebooks were renamed. The findings are unchanged.
 Evidence: `scripts/audit_matrix.py` writes `reports/audit_evidence.json`. Every number below comes from that file, from a notebook's saved output, or from a committed JSON, and is cited where it appears.
 
 ## 1. Summary verdict
 
 The v2 feature matrix is **not point-in-time safe**. Thirteen of its 87 "enhanced" features take the value observed in the same hour as the target, 29 features are joined on observation dates rather than publication dates, and the calendar features run on the UTC clock. So none of the historical results can support a forecasting claim. They are best read as a *retrospective estimation* benchmark, which is how the author's own `.tex` draft already frames them.
 
-The public headline (Chronos+XGBoost hybrid at $12.13/MWh MAE, CatBoost at $13.75) **cannot be traced to any executed artifact in the repository**. The five hybrid cells in `notebooks/10_chronos (1).ipynb` (cells 8–12) have `execution_count = None` and no outputs. Neither 12.13 nor 13.75 appears in any notebook output, JSON, or text report. The only saved CatBoost result is $20.90 on 63 features (`06_catboost (1).ipynb`).
+The public headline (Chronos+XGBoost hybrid at $12.13/MWh MAE, CatBoost at $13.75) **cannot be traced to any executed artifact in the repository**. The five hybrid cells in `notebooks/07_chronos_and_hybrid.ipynb` (cells 8–12) have `execution_count = None` and no outputs. Neither 12.13 nor 13.75 appears in any notebook output, JSON, or text report. The only saved CatBoost result is $20.90 on 63 features (`03_catboost.ipynb`).
 
 ## 2. Repository map
 
@@ -58,9 +59,9 @@ Severity: **C** = invalidates a forecasting claim; **M** = biases results or rep
 | 14 | M | **Missing data filled with 0.** Load (pre-2019), GDELT (pre-2017 and volume) and every other NaN get `ffill().fillna(0)`, which silently encodes the data era. | `feature_nan_share_top` |
 | 15 | M | **Backtest is in-sample for train events.** `evaluation/backtest.py` scores named events in 2017–2022 with a model trained on those years. | `evaluation/backtest.py` |
 | 16 | M | **Stress-hour breakdown conditions on the realised outcome.** The DAM benchmark's "stress hours" are hours with realised price above $100; this is descriptive, not a forecastable subset. | `evaluation/benchmark_dam.py` |
-| 17 | C | **Unexecuted headline.** The hybrid cells in notebook 10 were never run, and 12.13 / 13.75 are untraceable (§1). | `notebooks/10_chronos (1).ipynb` code cells 8–12 |
+| 17 | C | **Unexecuted headline.** The hybrid cells in notebook 10 were never run, and 12.13 / 13.75 are untraceable (§1). | `notebooks/07_chronos_and_hybrid.ipynb` code cells 8–12 |
 | 18 | M | **Stale or contradictory evaluation text.** `granger_results.json` has all p > 0.05 (e.g. `gdelt_tone` min p = 0.308), while the older narrative claims significance. | `evaluation/granger_results.json` |
-| 19 | L | **Notebook execution order.** 01, 04, 06, 07 and 11 have non-monotone execution counts; 13 (Prophet) and 14 (SARIMAX) were never executed. | notebook scan |
+| 19 | L | **Notebook execution order.** `data_inspection`, `build_engineered_matrix`, `03_catboost`, `04_ngboost`, and `residual_diagnostics` have non-monotone execution counts; `09_prophet_and_hybrid` and `10_sarimax` were never executed. | notebook scan |
 | 20 | L | **Missing RT day 2020-12-31 and truncated 2024-12-31** (§3). | `sources` |
 
 **Confirmed risks from the plan (items 1–15):** all confirmed except the load-timezone hypothesis (load is correctly UTC). New findings: 7 (UTC calendar), 13 (positional Chronos context straddling a gap), 14 (zero-fill era leakage), 15–16, and 20.
@@ -84,16 +85,16 @@ Severity: **C** = invalidates a forecasting claim; **M** = biases results or rep
 
 | Notebook | Executed | Saved headline numbers | Issues |
 |---|---|---|---|
-| 02_v2_models | all 12 cells, in order | GDELT ablation: with 22.21 / 108.88, without 24.64 / 114.20; spike PR-AUC 0.422 vs 0.400 | leaky features (failures 1–4); test threshold 0.5 |
-| 05_lightgbm | 9/10 | 19.76 | test threshold sweep |
-| 06_catboost (1) | 9/12, out of order | **20.90 / 101.54 on 63 features** | test threshold sweep; 63 ≠ 87 features |
-| 08_lstm, 09_tft | mostly | 32.45, 25.61 | |
-| 10_chronos (1) | **8/13** | zero-shot Chronos **14.86 / 116.42** (recall 41.2%, precision 59.5%) | **hybrid cells 8–12 never executed** |
-| 12_timesfm | 7/11 | 32.72 | |
-| 13_prophet, 14_sarimax | **0** | none | never run |
-| 15_timesfm_xgboost_augmented (gitignored) | 8/8 | TimesFM+XGB hybrid **23.52 / 120.15**, TimesFM alone 32.67 | an executed foundation hybrid that does *not* beat the XGB baseline in its notebook |
-| 11, 17 | yes | transform diagnostics | source of `apply_feature_transforms` |
-| 18_rag_forecaster | 12/13 | 25.61, 19.56 appear | test-query k sweep |
+| `01_xgboost` | all 12 cells, in order | GDELT ablation: with 22.21 / 108.88, without 24.64 / 114.20; spike PR-AUC 0.422 vs 0.400 | leaky features (failures 1–4); test threshold 0.5 |
+| `02_lightgbm` | 9/10 | 19.76 | test threshold sweep |
+| `03_catboost` | 9/12, out of order | **20.90 / 101.54 on 63 features** | test threshold sweep; 63 ≠ 87 features |
+| `05_lstm`, `06_tft` | mostly | 32.45, 25.61 | |
+| `07_chronos_and_hybrid` | **8/13** | zero-shot Chronos **14.86 / 116.42** (recall 41.2%, precision 59.5%) | **hybrid cells never executed** |
+| `08_timesfm` | 7/11 | 32.72 | |
+| `09_prophet_and_hybrid`, `10_sarimax` | **0** | none | never run |
+| `timesfm_xgboost` (gitignored) | 8/8 | TimesFM+XGB hybrid **23.52 / 120.15**, TimesFM alone 32.67 | an executed foundation hybrid that does *not* beat the XGB baseline in its notebook |
+| `residual_diagnostics`, `feature_diagnostics` | yes | transform diagnostics | source of `apply_feature_transforms` |
+| `rag_forecaster` | 12/13 | 25.61, 19.56 appear | test-query k sweep |
 
 ## 7. Result versions in circulation
 
@@ -101,7 +102,7 @@ Severity: **C** = invalidates a forecasting claim; **M** = biases results or rep
 2. **`.tex` draft**: numbers traced above (GDELT 24.64 → 22.21, 9.9%; CatBoost 20.90; Chronos 14.86; TimesFM 32.72; LSTM 32.45; TFT 25.61; DAM benchmark 19.56 vs 17.51). **Traceable, but computed on the leaky matrix.**
 3. **Script re-run** (`train_all_v2.py`): 24.58 → 19.17. It differs from version 2 because of the transform and seed path.
 
-All three are next-hour *regression* numbers on a leaky matrix. None of them measures multi-horizon early warning.
+All three are retrospective regression numbers on a leaky matrix. They were previously described as next-hour forecasts. None of them measures multi-horizon early warning.
 
 ## 8. Decision needed: public claims
 

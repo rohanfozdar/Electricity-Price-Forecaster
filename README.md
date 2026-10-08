@@ -1,456 +1,230 @@
-<h1 align="center">A Multimodal Framework for Electricity Price Forecasting<br>Using Sentiment-Augmented Time-Series Signals</h1>
+# ERCOT Electricity Price Forecasting
 
-<p align="center">
-  <b>Rohan Fozdar</b><br>
-  Knox College &middot; Mathematics Capstone
-</p>
+A multimodal benchmark of classical, machine-learning, deep-learning, foundation, and hybrid models for retrospective ERCOT electricity-price estimation and spike detection.
 
-<p align="center">
-  <a href="https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/"><img src="https://img.shields.io/badge/Project-Page-1f4e79?style=flat-square" alt="Project page"></a>
-  <a href="https://github.com/rohanfozdar/Electricity-Spot-Price-Forecaster/actions/workflows/ci.yml"><img src="https://github.com/rohanfozdar/Electricity-Spot-Price-Forecaster/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/python-3.9%2B-blue?style=flat-square" alt="Python 3.9+">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="MIT license"></a>
-</p>
+[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue?style=flat-square)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-<p align="center">
-  <img src="docs/static/images/teaser.png" alt="ERCOT hub-average price through the 2024 test year, with the 114 spike hours above $200/MWh marked, and a one-week zoom on the annual peak" width="100%">
-</p>
+ERCOT · 2016–2024 · 12 configurations · Manuscript in preparation
 
-Forecasting the **next-hour ERCOT real-time hub-average price** (`HB_HUBAVG`, $/MWh) and flagging
-spikes above **$200/MWh**, using price history, system load, weather, natural gas, nuclear outages,
-and GDELT news sentiment.
+## Overview
 
-**[Project page](https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/)** &middot;
-**[Paper (PDF)](docs/static/pdfs/paper.pdf)**
+The benchmark estimates the hourly ERCOT real-time hub-average price (`HB_HUBAVG`, $/MWh) and flags hours above $200/MWh. The sample is an engineered matrix of 77,956 hours from 2016 through 2024, built from real-time and day-ahead prices, load, Open-Meteo reanalysis, EIA natural gas and storage, NRC reactor status, GDELT news, and calendar variables. Some same-hour archived market variables and historical reanalysis remain in that matrix, so the executed experiments are retrospective hourly price estimation and spike detection. Next-hour forecasting is the intended operational extension; it needs a point-in-time feature lag that this benchmark does not apply.
 
----
+The comparison asks whether a frozen univariate forecast from a pretrained temporal model complements those ERCOT-specific covariates. Twelve configurations span structured machine learning, deep sequence models, foundation models, classical time-series models, and late-fusion hybrids. The chronological split is 2016–2022 train, 2023 validation, and 2024 test.
 
-## Abstract
-
-Electricity prices in ERCOT, the Texas grid, are strongly heavy-tailed. Most hours trade near a
-median of about **$21/MWh**, while a small number of grid-stress hours run toward the regulatory
-cap — the highest hour in this record settled at **$9,052/MWh** — and renewable oversupply can push
-prices negative. The economics of the market are therefore set by rare events rather than by typical
-conditions.
-
-This project asks whether multimodal signals, and news sentiment in particular, improve next-hour
-forecasts of the hub-average price. Eight data sources are assembled into an hourly matrix of
-**77,956 observations and 87 engineered features** covering 2016 through 2024, and **13 model
-configurations** are benchmarked under one strictly chronological split.
-
-The strongest configuration is neither purely supervised nor purely zero-shot. Feeding a frozen
-Chronos forecast into XGBoost as a single extra feature yields **$12.13/MWh MAE with 61.4% spike
-recall** on the held-out 2024 test year, ahead of the best standalone supervised model at
-$13.75/MWh.
-
-> The core question: can multimodal signals — especially news sentiment — improve electricity price
-> forecasting in a market dominated by rare but extreme price spikes?
-
-### Why ERCOT?
-
-ERCOT prices are highly nonlinear and heavy-tailed. Most hours are ordinary, but a small number of
-grid-stress events dominate the economics. Over 2016–2024, measured on the matrix in this
-repository:
-
-* Median real-time price: **$21/MWh**
-* Spike threshold used here: **>$200/MWh**
-* Spikes are **1,844 of 77,955 hours**, about **2.4%** of the record
-* The highest hour settled at **$9,052/MWh**
-* Negative prices occur during renewable oversupply conditions
-
-This makes ERCOT forecasting less about predicting the average hour and more about handling the tail.
-
----
-
-## Results
-
-All metrics are reported on the held-out **2024 test set** (8,767 hours, 114 of them spike hours).
-Spike metrics use `HB_HUBAVG > $200/MWh`. The table is the results table from the capstone
-paper, pages 4–5 of [docs/static/pdfs/paper.pdf](docs/static/pdfs/paper.pdf).
-
-| Rank | Model                 | Family        |       MAE |      RMSE | Spike Recall | Spike Precision |
-| :--: | --------------------- | ------------- | --------: | --------: | -----------: | --------------: |
-|   1  | **Chronos Hybrid**    | Hybrid        | **12.13** | **93.98** |       61.40% |          50.43% |
-|   2  | **CatBoost**          | GBT           |     13.75 |     95.48 |       44.35% |          56.94% |
-|   3  | NGBoost               | GBT           |     14.59 |    106.44 |       25.44% |          59.18% |
-|   4  | Chronos               | Foundation    |     14.72 |    115.59 |       42.11% |      **60.76%** |
-|   5  | SARIMAX               | Classical     |     18.45 |    124.31 |       45.61% |          38.81% |
-|   6  | LightGBM              | GBT           |     19.76 |    100.41 |       34.21% |          45.35% |
-|   7  | LSTM                  | Deep Learning |     24.42 |    148.72 |       16.67% |          23.46% |
-|   8  | XGBoost               | GBT           |     24.43 |    112.46 |       57.02% |          25.10% |
-|   9  | TimesFM               | Foundation    |     32.51 |    136.94 |        1.75% |          11.76% |
-|  10  | XGBoost, no sentiment | Ablation      |     34.53 |    122.57 |       50.53% |          19.54% |
-|  11  | TFT                   | Deep Learning |     45.75 |    134.60 |        0.00% |           0.00% |
-|  12  | Prophet Hybrid        | Hybrid        |     48.36 |    108.96 |   **71.05%** |          14.16% |
-|  13  | Prophet               | Classical     |    119.14 |    168.75 |       57.14% |          17.70% |
-
-<p align="center">
-  <img src="docs/static/images/spike_tradeoff.png" alt="Spike precision against spike recall for every model, with iso-F1 contours" width="88%">
-</p>
-
-The project compares twelve forecasting architectures across five families, plus one no-sentiment
-XGBoost ablation:
-
-| Family                      | Models                               |
-| --------------------------- | ------------------------------------ |
-| Gradient Boosted Trees      | XGBoost, LightGBM, CatBoost, NGBoost |
-| Deep Learning               | LSTM, Temporal Fusion Transformer    |
-| Zero-Shot Foundation Models | Chronos, TimesFM                     |
-| Classical Time Series       | SARIMAX, Prophet                     |
-| Hybrid Models               | Chronos + XGBoost, Prophet + XGBoost |
-| Ablation                    | XGBoost without sentiment            |
-
----
-
-## Method
-
-<p align="center">
-  <img src="docs/static/images/architecture.png" alt="Architecture of the Chronos plus XGBoost hybrid" width="100%">
-</p>
-
-The hybrid keeps the two halves of the problem separate. **Chronos** (`amazon/chronos-t5-small`)
-sees only the raw price series: a 512-hour context window, from which it forecasts one hour ahead.
-It is never fine-tuned. That forecast is appended to the 87 engineered features as a column named
-`chronos_pred`, and **XGBoost** trains on the 88-column result, learning when the univariate
-forecast deserves trust and when weather, outage, gas, and sentiment features should override it.
-
-The pipeline runs in stages:
-
-```text
-raw data → hourly feature matrix → model training → benchmark evaluation → dashboard
+```mermaid
+flowchart TD
+    sources[Raw sources] --> matrix[Feature matrix]
+    matrix --> tabular[Structured models]
+    matrix --> temporal[Temporal models]
+    temporal --> forecasts[Chronos and Prophet forecasts]
+    matrix --> fusion[Late fusion]
+    forecasts --> fusion
+    fusion --> xgb[XGBoost]
+    tabular --> evalNode[2024 evaluation]
+    temporal --> evalNode
+    xgb --> evalNode
 ```
 
-| Folder | Contents |
-| --- | --- |
-| `pipelines/` | Data ingestion, one script per source |
-| `features/` | Feature matrix construction and engineering |
-| `models/` | Training scripts, shared utilities, metrics |
-| `notebooks/` | Model-specific experiments, one per benchmarked model |
-| `evaluation/` | Granger causality, backtests, day-ahead-market benchmark |
-| `figures/` | Regenerates every figure on the project page |
-| `dashboard/` | Streamlit dashboard |
-| `docs/` | The project page, served by GitHub Pages |
-| `tests/` | Unit tests |
+## Model Taxonomy
 
-Files worth knowing about:
+| Model | Family | Information | Regime | Paper | Code |
+| --- | --- | --- | --- | --- | --- |
+| XGBoost | Structured ML | Multimodal covariates | Supervised | [Chen and Guestrin 2016](https://arxiv.org/abs/1603.02754) | [01_xgboost.ipynb](notebooks/01_xgboost.ipynb) |
+| LightGBM | Structured ML | Multimodal covariates | Supervised | [Ke et al. 2017](https://proceedings.neurips.cc/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html) | [02_lightgbm.ipynb](notebooks/02_lightgbm.ipynb) |
+| CatBoost | Structured ML | Multimodal covariates | Supervised | [Prokhorenkova et al. 2018](https://arxiv.org/abs/1706.09516) | [03_catboost.ipynb](notebooks/03_catboost.ipynb) |
+| NGBoost | Structured ML | Multimodal covariates | Supervised | [Duan et al. 2020](https://arxiv.org/abs/1910.03225) | [04_ngboost.ipynb](notebooks/04_ngboost.ipynb) |
+| LSTM | Deep Sequence | Multivariate sequence | Supervised | [Hochreiter and Schmidhuber 1997](https://doi.org/10.1162/neco.1997.9.8.1735) | [05_lstm.ipynb](notebooks/05_lstm.ipynb) |
+| Temporal Fusion Transformer | Deep Sequence | Multivariate sequence | Supervised | [Lim et al. 2021](https://arxiv.org/abs/1912.09363) | [06_tft.ipynb](notebooks/06_tft.ipynb) |
+| Chronos | Foundation | Price history | Zero-shot | [Ansari et al. 2024](https://arxiv.org/abs/2403.07815) | [07_chronos_and_hybrid.ipynb](notebooks/07_chronos_and_hybrid.ipynb) |
+| TimesFM | Foundation | Price history | Zero-shot | [Das et al. 2024](https://arxiv.org/abs/2310.10688) | [08_timesfm.ipynb](notebooks/08_timesfm.ipynb) |
+| SARIMAX | Classical | Price history + statistical structure | Series-specific | [Box, Jenkins, Reinsel, and Ljung](https://doi.org/10.1002/9781118619193) | [10_sarimax.ipynb](notebooks/10_sarimax.ipynb) |
+| Prophet | Classical | Price history + statistical structure | Series-specific | [Taylor and Letham 2018](https://doi.org/10.1080/00031305.2017.1380080) | [09_prophet_and_hybrid.ipynb](notebooks/09_prophet_and_hybrid.ipynb) |
+| Chronos–XGBoost | Hybrid | Foundation forecast + multimodal covariates | Late fusion | [Ansari et al. 2024](https://arxiv.org/abs/2403.07815); [Chen and Guestrin 2016](https://arxiv.org/abs/1603.02754) | [07_chronos_and_hybrid.ipynb](notebooks/07_chronos_and_hybrid.ipynb) |
+| Prophet–XGBoost | Hybrid | Statistical forecast + multimodal covariates | Late fusion | [Taylor and Letham 2018](https://doi.org/10.1080/00031305.2017.1380080); [Chen and Guestrin 2016](https://arxiv.org/abs/1603.02754) | [09_prophet_and_hybrid.ipynb](notebooks/09_prophet_and_hybrid.ipynb) |
 
-| File | Role |
-| --- | --- |
-| `run_full_pipeline.py` | Stage orchestrator — start here |
-| `models/utils.py` | Splits, feature groups, transforms, metrics |
-| `models/train_all_v2.py` | Trains every XGBoost regressor and classifier |
-| `models/train_chronos_hybrid.py` | The winning model, as a runnable script |
-| `features/engineer_v2.py` | Lags, rolling stats, stress flags |
+Chronos–XGBoost and Prophet–XGBoost are sections of the Chronos and Prophet notebooks, not separate files. The experiment index is [notebooks/README.md](notebooks/README.md).
 
-All models use the same chronological split, with no random shuffling:
+## Benchmark
 
-| Split      |     Years |
-| ---------- | --------: |
-| Train      | 2016–2022 |
-| Validation |      2023 |
-| Test       |      2024 |
+Reported consolidated project benchmark on the 2024 test year. Spike metrics use `HB_HUBAVG > $200/MWh`.
 
----
+| Model | Family | MAE | RMSE | Spike recall | Spike precision |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Chronos–XGBoost | Hybrid | 12.13 | 93.98 | 61.40% | 50.43% |
+| CatBoost | Structured ML | 13.75 | 95.48 | 44.35% | 56.94% |
+| NGBoost | Structured ML | 14.59 | 106.44 | 25.44% | 59.18% |
+| Chronos | Foundation | 14.72 | 115.59 | 42.11% | 60.76% |
+| SARIMAX | Classical | 18.45 | 124.31 | 45.61% | 38.81% |
+| LightGBM | Structured ML | 19.76 | 100.41 | 34.21% | 45.35% |
+| LSTM | Deep Sequence | 24.42 | 148.72 | 16.67% | 23.46% |
+| XGBoost | Structured ML | 24.43 | 112.46 | 57.02% | 25.10% |
+| TimesFM | Foundation | 32.51 | 136.94 | 1.75% | 11.76% |
+| TFT | Deep Sequence | 45.75 | 134.60 | 0% | 0% |
+| Prophet–XGBoost | Hybrid | 48.36 | 108.96 | 71.05% | 14.16% |
+| Prophet | Classical | 119.14 | 168.75 | 57.14% | 17.70% |
 
-## Key Findings
+1. The consolidated project benchmark reports Chronos–XGBoost as the lowest-error configuration.
+2. Standalone Chronos has high precision, while XGBoost has higher recall; the hybrid reports a stronger balance.
+3. Prophet–XGBoost reaches high recall but creates a large false-positive burden.
 
-**1. The best model is not purely supervised or purely zero-shot.** Chronos provides a univariate
-temporal forecast; XGBoost combines it with the full physical, market, weather, outage, and
-sentiment feature set. Best MAE $12.13/MWh, best RMSE $93.98/MWh.
+Aggregate benchmark values come from the project's consolidated comparison, recorded in the capstone PDF ([docs/static/pdfs/paper.pdf](docs/static/pdfs/paper.pdf)) and in `figures/make_figures.py` (`PAPER_LEADERBOARD`). They were produced across multiple experiment versions. The matched GDELT ablation below has preserved executed output in [notebooks/01_xgboost.ipynb](notebooks/01_xgboost.ipynb); a common frozen rerun is still required for a strict cross-model leaderboard. Saved notebook outputs agree with the LightGBM row and differ for several other models. The [notebook index](notebooks/README.md) records which outputs exist.
 
-**2. CatBoost is the best standalone supervised model** at $13.75/MWh MAE and $95.48/MWh RMSE.
-Tree-based models handle ERCOT's nonlinear feature interactions better than the deep learning
-models tested here.
+## GDELT Ablation
 
-**3. News sentiment matters.** GDELT tone is the highest-gain single feature in the 87-feature
-model, and the XGBoost ablation shows the cost of removing the sentiment family:
+Matched XGBoost comparison from the saved output of [notebooks/01_xgboost.ipynb](notebooks/01_xgboost.ipynb): same transforms, split, hyperparameters, and target, with the GDELT columns removed. An earlier consolidated row reported MAE 34.53 without sentiment and 24.43 with sentiment. That pair is a different comparison. A script re-run of `models/train_all_v2.py` reported MAE 24.58 without the sentiment block and 19.17 with the enhanced feature set. Neither pair is the ablation below.
 
-| Model                     |   MAE |   RMSE | Spike Recall | Spike Precision |
-| ------------------------- | ----: | -----: | -----------: | --------------: |
-| XGBoost without sentiment | 34.53 | 122.57 |       50.53% |          19.54% |
-| XGBoost with sentiment    | 24.43 | 112.46 |       57.02% |          25.10% |
+| Setting | MAE | RMSE | Spike recall | Spike precision | PR-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Without GDELT | 24.64 | 114.20 | 57.89% | 24.81% | 0.400 |
+| With GDELT | 22.21 | 108.88 | 54.39% | 30.24% | 0.422 |
 
-That is $10.10/MWh, or 29.3%.
+Adding GDELT features reduces MAE by 9.9% and improves precision and PR-AUC, while recall decreases slightly.
 
-> [!NOTE]
-> The $34.53 no-sentiment figure does not reproduce when the ablation is re-run
-> from this repository — see [Reproducibility](#reproducibility). A like-for-like
-> re-run still shows sentiment helping, by 22.0%.
+## Data
 
-**4. Deep learning underperforms on this dataset.** The LSTM performs reasonably on MAE but misses
-most spikes, and the Temporal Fusion Transformer produces zero spike recall on 2024. The issue is
-not model capacity alone: ERCOT spike behavior is rare, nonlinear, and event-driven.
+The engineered matrix has 77,956 hourly observations from 2016 through 2024 (`data/features/feature_matrix_engineered_v2.parquet`).
 
-**5. Spike prediction is a tradeoff.** Chronos is precise but misses some spikes. Prophet Hybrid
-catches many spikes but creates many false alarms. Chronos Hybrid gives the best overall balance.
+| Source | Variables | Frequency | Role |
+| --- | --- | --- | --- |
+| ERCOT real-time | Hub settlement prices, including `HB_HUBAVG` | 15-minute, aggregated hourly | Target and price history |
+| ERCOT day-ahead | Hub settlement prices | Hourly | Market covariate |
+| ERCOT / EIA load | System load | Hourly | Demand covariate |
+| Open-Meteo | Temperature, wind, humidity, cloud cover, precipitation | Hourly | Weather reanalysis |
+| EIA natural gas | Henry Hub spot price | Daily | Fuel price |
+| EIA storage | Lower 48 working gas | Weekly | Fuel balance |
+| NRC reactor status | Capacity factor for ERCOT reactors | Daily | Outage covariate |
+| GDELT | Article tone and volume | Daily | News covariate |
+| Calendar variables | Hour, day of week, month, weekend, peak flag | Hourly | Seasonal structure |
 
-<p align="center">
-  <img src="docs/static/images/feature_importance.png" alt="Top 20 features of the 87-feature model" width="80%">
-</p>
+`data/raw/` is gitignored. Re-pulling primary sources requires an EIA key in `.env` (see `.env.example`). The committed matrix is enough to open the benchmark notebooks.
 
----
+## Repository
+
+Two experiments share this repository. The benchmark notebooks and `models/` score the hourly matrix. `src/` is a separate six-hour-ahead early-warning pipeline and is not the source of the tables below.
+
+```text
+.
+├── pipelines/                 # Source ingestion
+├── features/                  # v1 and v2 matrix construction
+├── models/                    # Benchmark training and the frozen 2024 protocol
+│   ├── train_all_v2.py
+│   ├── train_chronos_hybrid.py
+│   ├── run_benchmark.py       # Paper-row reruns and the leaderboard writer
+│   ├── improve_hybrid.py      # Validation search over the hybrid
+│   ├── honest_mae.py          # One-hour-ahead protocol; 2024 scored once
+│   └── chronos_hourly_features.py
+├── notebooks/                 # Benchmark experiments, numbered 01–10
+├── evaluation/                # Granger tests, backtests, day-ahead benchmark
+├── dashboard/                 # Streamlit view of the v2 XGBoost artifacts
+├── figures/                   # Figures for the project page
+├── src/                       # Point-in-time early-warning experiment
+├── configs/                   # Feature-availability and experiment rules
+├── scripts/                   # Audit, Chronos caches, early-warning runner
+├── reports/
+│   ├── reproduction.md        # What the paper rows do and do not reproduce
+│   ├── honest_mae.md          # Frozen one-hour-ahead scores
+│   ├── repository_audit.md
+│   └── experiment_design.md
+├── data/
+│   ├── raw/                   # Gitignored primary pulls
+│   └── features/              # Committed v2 matrix
+├── tests/
+├── docs/                      # Project page; capstone PDF under docs/static/pdfs/
+├── run_full_pipeline.py       # Ingest, features, XGBoost scripts, evaluation
+├── run_pipeline.py            # Real-time and day-ahead price pulls only
+└── README.md
+```
+
+The canonical artifact for the benchmark is the v2 matrix. Notebooks, `models/train_all_v2.py`, and `dashboard/app.py` read `data/features/feature_matrix_engineered_v2.parquet` and, for the dashboard, `models/artifacts/enhanced_v2_*`. `run_full_pipeline.py` builds that matrix when `data/raw/` is present. The v1 builders stay available behind `BUILD_V1_MATRIX=1` and are off the default path. Prediction files and fitted boosters live under `runs/`, which is gitignored. The write-ups in `reports/` are the durable record.
 
 ## Setup
 
-Python 3.9 or newer.
-
 ```bash
-git clone https://github.com/rohanfozdar/Electricity-Spot-Price-Forecaster.git
-cd Electricity-Spot-Price-Forecaster
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
 ```
 
-That base install covers the data pipelines, XGBoost, LightGBM, SARIMAX, the figure scripts, the
-evaluation scripts and the dashboard. The heavier model families are optional extras, so you only
-install what you intend to run:
+The base install covers pipelines, the XGBoost scripts, LightGBM, SARIMAX via statsmodels, evaluation, and the dashboard. Other families are extras:
 
-| Extra | Installs | Needed for |
-| --- | --- | --- |
-| `.[trees]` | catboost, ngboost | CatBoost, NGBoost notebooks |
-| `.[classical]` | prophet, pmdarima | Prophet, SARIMAX notebooks |
-| `.[deep]` | torch, pytorch-forecasting, pytorch-lightning | LSTM, TFT |
-| `.[foundation]` | chronos-forecasting, transformers, accelerate | Chronos, **Chronos hybrid** |
-| `.[all]` | everything above | the full bake-off |
+| Extra | Needed for |
+| --- | --- |
+| `.[trees]` | CatBoost, NGBoost |
+| `.[classical]` | Prophet, `pmdarima` order search |
+| `.[deep]` | LSTM, TFT |
+| `.[foundation]` | Chronos and `models/train_chronos_hybrid.py` |
+| `.[all]` | Every extra above |
 
-```bash
-pip install -e ".[foundation]"   # to reproduce the winning model
-```
-
-An API key is only needed to **re-pull raw data**. Every model runs off the committed feature matrix
-without one:
+Two entry points:
 
 ```bash
-cp .env.example .env        # then add your free EIA key if re-pulling
+python run_full_pipeline.py --stage models
 ```
 
----
-
-## What ships in the repo, and what you regenerate
-
-This trips people up, so it is worth stating plainly. The repository commits exactly one data file,
-and it is the one every model reads:
-
-| Path | In git? | How to get it |
-| --- | :---: | --- |
-| `data/features/feature_matrix_engineered_v2.parquet` | **yes** (9.9 MB) | ships — 77,956 x 95, the canonical matrix |
-| `docs/static/images/*.png` | **yes** | regenerate with `python figures/make_figures.py` |
-| `evaluation/*_results.json` | yes | regenerate with `--stage evaluate` |
-| `data/raw/*.parquet` | no | `python run_full_pipeline.py --stage pipelines` (needs an EIA key) |
-| `data/features/feature_matrix_raw_v2.parquet` | no | `python run_full_pipeline.py --stage features` |
-| `models/artifacts/*` | no | `python run_full_pipeline.py --stage models` |
-
-So a fresh clone can train and evaluate every model immediately. Only re-deriving the matrix from
-primary sources needs the raw pull.
-
----
-
-## Usage
-
-The orchestrator runs in stages. Each depends on the one before it:
+That command trains the XGBoost script family (baseline, enhanced, classifiers, and the v2 bundle). It does not train or score the twelve benchmark configurations. Those live in the notebooks. `--stage evaluate` runs Granger tests, the stress-event backtest, and the day-ahead benchmark. `--stage pipelines` and `--stage features` re-pull and rebuild the matrix; both skip with a message when `data/raw/` is empty. `--stage dashboard` launches Streamlit.
 
 ```bash
-python run_full_pipeline.py --stage models      # train (works on a fresh clone)
-python run_full_pipeline.py --stage evaluate    # Granger, backtest, DAM benchmark
-python run_full_pipeline.py --stage dashboard   # Streamlit
+jupyter lab notebooks/01_xgboost.ipynb
 ```
 
-```bash
-python run_full_pipeline.py --stage pipelines   # re-pull raw sources (needs EIA key)
-python run_full_pipeline.py --stage features    # rebuild the matrix from raw
-```
-
-`--stage features` and `--stage pipelines` skip with an explanatory message if `data/raw/` is empty,
-rather than failing.
-
-### Reproducing the winning model
-
-The Chronos hybrid is the headline result, and it has its own script:
-
-```bash
-pip install -e ".[foundation]"
-python models/train_chronos_hybrid.py
-```
-
-Read the runtime warning below before starting it, and see **[GPU_RUN.md](GPU_RUN.md)** for
-step-by-step instructions on a GPU machine or cluster.
-
-### Regenerating the figures
-
-Every figure on the project page and in this README is generated from the committed matrix:
-
-```bash
-python figures/make_figures.py            # all figures
-python figures/make_figures.py --list     # names
-python figures/make_figures.py --only teaser
-```
-
-`feature_importance.png` additionally needs `--stage models` to have been run, since it reads a
-model artifact. The script says so and skips that one figure rather than failing.
-
-### Individual models
-
-Each notebook is self-contained and reads the committed matrix:
-
-```bash
-jupyter lab "notebooks/06_catboost (1).ipynb"
-```
-
-| Notebook | Model | Extra required |
-| --- | --- | --- |
-| `02_v2_models.ipynb` | XGBoost + ablation | base |
-| `05_lightgbm.ipynb` | LightGBM | base |
-| `06_catboost (1).ipynb` | CatBoost | `.[trees]` |
-| `07_ngboost.ipynb` | NGBoost | `.[trees]` |
-| `08_lstm.ipynb` | LSTM | `.[deep]` |
-| `09_tft.ipynb` | Temporal Fusion Transformer | `.[deep]` |
-| `10_chronos (1).ipynb` | Chronos + **Chronos hybrid** | `.[foundation]` |
-| `12_timesfm.ipynb` | TimesFM | `.[deep]` + `timesfm` |
-| `13_prophet.ipynb` | Prophet + Prophet hybrid | `.[classical]` |
-| `14_sarimax.ipynb` | SARIMAX | `.[classical]` |
-
----
-
-## Reproducibility
-
-The leaderboard above is the record from the capstone paper. The tables here report what the
-training scripts in this repository produce when re-run today, so you can tell at a glance which
-numbers are the published result and which are a live re-run.
-
-**Re-run on 2026-09-05** (`python run_full_pipeline.py --stage models`, XGBoost regressors on the
-committed v2 matrix):
-
-| Model | Features | MAE | RMSE | Spike recall | Spike precision |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| `baseline_v2` — no sentiment | 52 | 24.58 | 117.76 | 53.51% | 24.90% |
-| `enhanced_v2` — with sentiment | 87 | **19.17** | **108.59** | 42.98% | 33.33% |
-
-Both are trained by the same function (`models/train_all_v2.py:_train_regressor`) with identical
-hyperparameters, so the only difference between them is the feature set. That makes it a clean
-ablation:
-
-```text
-sentiment reduces MAE by $5.42/MWh, or 22.0%
-```
-
-<p align="center">
-  <img src="docs/static/images/sentiment_ablation.png" alt="The paper's sentiment ablation beside the re-run from this repository" width="78%">
-</p>
-
-### Known discrepancy in the sentiment ablation
-
-Key Finding #3 above cites $34.53 vs $24.43, a 29.3% reduction. **The $34.53 no-sentiment figure
-does not reproduce from this codebase.** Re-running the ablation four ways — v1 and v2 matrices,
-with and without the log1p transforms — puts the no-sentiment MAE between $22.17 and $24.58 every
-time; nothing lands near $34.53.
-
-The paper's *conclusion* holds: on a like-for-like comparison sentiment reduces MAE by 22.0%, which
-is the same direction and a similar magnitude. But the specific pair of numbers in the leaderboard
-should be treated as the paper's record rather than something you can regenerate by running this
-repository.
-
-### The headline hybrid number is also the paper's record
-
-The Chronos backfill needed for the hybrid is roughly 77,400 forward passes, and it has not been
-completed end-to-end on the machine used to prepare this release. `models/train_chronos_hybrid.py`
-is the script that reproduces it, it checkpoints and resumes, and
-[GPU_RUN.md](GPU_RUN.md) walks through running it on a GPU. Until that run finishes, treat
-$12.13/MWh as the published figure rather than a number this repository has regenerated.
-
-### What was and was not re-executed
-
-Seven configurations — CatBoost, NGBoost, LSTM, TFT, TimesFM, Prophet and SARIMAX — were verified by
-code inspection rather than re-executed for this release, and the runtime table below is
-approximate. The Streamlit dashboard has been repaired by inspection but has not been observed
-rendering.
-
-### One pipeline, applied consistently
-
-The model notebooks apply `models/utils.py:apply_feature_transforms` (log1p over 34 heavily
-right-skewed columns) before training; the scripts in `models/` originally did not. The same model
-therefore produced different numbers depending on whether you ran the notebook or the script.
-
-The scripts now apply the same transform, so both paths sit on one pipeline. If you are comparing
-against an older artifact, that change is the reason the numbers moved.
-
----
-
-## Runtime and hardware
-
-> [!WARNING]
-> **The Chronos backfill is by far the slowest step in this project.** The hybrid needs a
-> one-hour-ahead Chronos forecast for *every* hourly observation, which is about **77,400 forward
-> passes** of `amazon/chronos-t5-small` over a 512-hour context. Budget **30-60 minutes on an NVIDIA
-> GPU**, roughly **70 minutes on Apple MPS**, and **many hours on a CPU-only machine**. A GPU is
-> strongly recommended.
->
-> `models/train_chronos_hybrid.py` checkpoints to `data/features/chronos_pred.parquet` every 20
-> batches, so an interrupted run resumes instead of restarting. Re-running the script is always safe.
-
-Approximate wall-clock on the 2016-2024 matrix:
-
-| Model | GPU | CPU | Notes |
-| --- | --- | --- | --- |
-| XGBoost, LightGBM, CatBoost, NGBoost | n/a | 1-5 min | CPU is fine; no GPU benefit |
-| Prophet / Prophet hybrid | n/a | 5-15 min | CPU only |
-| SARIMAX | n/a | 30-90 min | `auto_arima` search; **no GPU benefit** |
-| LSTM | 5-15 min | 1-3 h | **GPU recommended** |
-| TFT | 10-20 min | 2-4 h | **GPU recommended** |
-| TimesFM | 20-40 min | several hours | **GPU strongly recommended** |
-| **Chronos hybrid** | **30-60 min** | **many hours** | **GPU strongly recommended**; resumable |
-
-Memory notes:
-
-- On Apple MPS, keep `--batch-size` at 32 or below. Batch 64 exhausts a 20 GB MPS pool partway
-  through the backfill. The script catches the OOM, checkpoints, and tells you what to re-run.
-- The deep-learning notebooks fall back to CPU automatically when CUDA is unavailable, so they run
-  anywhere — just slowly.
-
----
+Open one notebook per configuration. Install the extra for that family first. Chronos backfill and the deep-sequence notebooks are the slow steps; [GPU_RUN.md](GPU_RUN.md) covers the Chronos hybrid script. The hybrid cells in the Chronos and Prophet notebooks were not executed in the saved notebooks.
 
 ## Paper
 
-This repository supports the paper:
+**A Multimodal Benchmark of Classical, Machine Learning, and Foundation Models for ERCOT Electricity Price Forecasting**
 
-**A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series
-Signals**
+The manuscript benchmarks twelve forecasting configurations and studies whether pretrained temporal forecasts complement ERCOT-specific structured covariates.
 
-The PDF is [docs/static/pdfs/paper.pdf](docs/static/pdfs/paper.pdf). The leaderboard above is that
-paper's results table, not a fresh re-run. The paper contains the full methodology, feature
-construction, model descriptions, and discussion.
+Manuscript in preparation.
+
+An earlier capstone PDF, under a different title, is at [docs/static/pdfs/paper.pdf](docs/static/pdfs/paper.pdf). The consolidated table above is the comparison recorded there.
+
+## Reproducibility
+
+A frozen rerun of the headline rows is written up in [reports/reproduction.md](reports/reproduction.md). The 2024 test index is 8,767 hours and 114 spikes, hash `b850034b0690e660`. Choices were made on 2023 only. The tables above are the paper's reported numbers and are unchanged.
+
+On this Linux host, with XGBoost 2.1.4 and Chronos-T5 small:
+
+- Chronos zero-shot lands at MAE 14.54 (paper 14.72). Three more sampling seeds span 14.56–14.89.
+- The day-ahead price row matches the paper on MAE, RMSE, spike recall, and spike precision.
+- The notebook-faithful Chronos–XGBoost hybrid lands at MAE 21.96, RMSE 112.83, spike recall 58.77%, spike precision 30.45% (paper 12.13 / 93.98 / 61.40% / 50.43%). A validation-only search, scored once on 2024 over five seeds, reaches MAE 13.06 ± 0.17 and precision 70.9% ± 3.3, with RMSE 107.18 and recall 38.1%. The Chronos–XGBoost and CatBoost recall/precision pairs in the table above are not integer ratios on 114 spikes, so they cannot be matched exactly.
+- The 24-hour alert, with the calibrator and threshold chosen on 2023, scores recall 43.10%, precision 24.63%, F1 31.01% (paper 34.63% / 24.22% / 28.50%). Lead times for the seven spike events are in the report.
+
+Prediction vectors and `runs/benchmark/leaderboard.md` are produced by `python models/run_benchmark.py leaderboard`. The `runs/` directory is gitignored.
+
+## One-hour-ahead protocol
+
+`models/honest_mae.py` keeps the selected Chronos–XGBoost hyperparameters (gap-aware Chronos-T5, asinh target, absolute-error XGBoost, depth 6, learning rate 0.05, seed 42) and changes the information set and the training window. Weather and the weather stress flags are lagged one hour. The gas-spike flag uses the pre-2023 90th percentile. GDELT is dropped. New columns are the previous hour's 15-minute price summaries and the day-ahead shape (ramp, operating-day max and min, trailing real-time minus day-ahead spread). The training window, 2019–2022, is the length with the lowest MAE on 2022. Early stopping uses 2023. The 2024 year is not used to choose a window, a penalty, or a weight.
+
+The full write-up is [reports/honest_mae.md](reports/honest_mae.md). On the frozen 2024 index:
+
+| Run | MAE | RMSE | Spike recall | Spike precision |
+| --- | ---: | ---: | ---: | ---: |
+| Windowed tree | 11.56 | 99.96 | 50.00% | 73.08% |
+| 2023 quantile stack | 12.13 | 96.23 | 53.51% | 64.21% |
+| Same hyperparameters, original features | 12.95 | 104.13 | 42.11% | 69.57% |
+
+The paper table above is unchanged. The stack's MAE prints as 12.13 with a different RMSE and a different spike pair, so it is not the paper row. Both new scores are one seed.
+
+```bash
+python models/honest_mae.py check   # rewrite the report from saved predictions
+python models/honest_mae.py all     # run the protocol; existing predictions are left alone
+pytest tests/test_honest_mae.py
+```
 
 ## Citation
 
 ```bibtex
-@misc{fozdar2026multimodal,
-  title  = {A Multimodal Framework for Electricity Price Forecasting Using
-            Sentiment-Augmented Time-Series Signals},
+@misc{fozdar2026ercot,
   author = {Fozdar, Rohan},
-  year   = {2026},
-  note   = {Mathematics Capstone, Knox College},
-  url    = {https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/}
+  title = {A Multimodal Benchmark of Classical, Machine Learning, and Foundation Models for ERCOT Electricity Price Forecasting},
+  year = {2026},
+  howpublished = {\url{https://github.com/rohanfozdar/Electricity-Price-Forecaster}}
 }
 ```
 
 ## License
 
-Code in this repository is released under the [MIT License](LICENSE). The project page under
-`docs/` is built on the
-[Academic Project Page Template](https://github.com/eliahuhorwitz/Academic-project-page-template),
-which derives from [Nerfies](https://nerfies.github.io) and is licensed
-[CC BY-SA 4.0](http://creativecommons.org/licenses/by-sa/4.0/).
-
-Data remains the property of its providers: ERCOT, the EIA, Open-Meteo, the NRC, and GDELT.
-
-## Acknowledgments
-
-Built with [Chronos](https://github.com/amazon-science/chronos-forecasting) from Amazon Science,
-[XGBoost](https://github.com/dmlc/xgboost), and public data from ERCOT, the U.S. Energy Information
-Administration, Open-Meteo, the Nuclear Regulatory Commission, and the GDELT Project.
-
----
-
-<p align="center">
-  <b>Rohan Fozdar</b> &middot; Knox College &middot; Mathematics Capstone Project
-</p>
+Code is released under the [MIT License](LICENSE). Data remains the property of ERCOT, the EIA, Open-Meteo, the NRC, and GDELT. The project page under `docs/` is built on the [Academic Project Page Template](https://github.com/eliahuhorwitz/Academic-project-page-template).

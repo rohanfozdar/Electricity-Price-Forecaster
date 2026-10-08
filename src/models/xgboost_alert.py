@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+import os
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -86,10 +87,12 @@ def fit_alert_model(name: str, Xtr: pd.DataFrame, ytr: np.ndarray, Xva: pd.DataF
     fixed = dict(cfg["fixed"])
     n_est = fixed.pop("n_estimators")
     es = fixed.pop("early_stopping_rounds")
+    device = os.environ.get("ERCOT_XGB_DEVICE", "cpu")
     best = None
     for params in grid_configs(cfg["grid"], int(ytr.sum()), int(len(ytr) - ytr.sum())):
         clf = xgb.XGBClassifier(n_estimators=n_est, early_stopping_rounds=es, random_state=seed,
-                                n_jobs=-1, objective="binary:logistic", **fixed, **params)
+                                n_jobs=1 if device != "cpu" else -1, device=device,
+                                objective="binary:logistic", **fixed, **params)
         clf.fit(Xtr[features], ytr, eval_set=[(Xva[features], yva)], verbose=False)
         p = clf.predict_proba(Xva[features])[:, 1]
         ap = average_precision_score(yva, p) if yva.sum() > 0 else float("nan")
@@ -99,6 +102,7 @@ def fit_alert_model(name: str, Xtr: pd.DataFrame, ytr: np.ndarray, Xva: pd.DataF
     platt = Platt.fit(p_val, yva)
     thr = f1_threshold(platt.apply(p_val), yva)
     imp = pd.Series(clf.get_booster().get_score(importance_type="gain")).reindex(features).fillna(0.0)
+    params = {**params, "device": device}
     return FittedAlertModel(name=name, features=features, params=params, val_ap=float(ap),
                             best_iteration=int(clf.best_iteration), booster=clf, platt=platt,
                             threshold=thr, importance=imp.sort_values(ascending=False))

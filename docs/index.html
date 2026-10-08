@@ -6,7 +6,7 @@
 
   <!-- Primary Meta Tags -->
   <meta name="title" content="A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals - Rohan Fozdar">
-  <meta name="description" content="Next-hour ERCOT electricity price forecasting across 13 model configurations. A Chronos + XGBoost hybrid reaches $12.13/MWh MAE and 61% spike recall on 2024 data.">
+  <meta name="description" content="Retrospective hourly ERCOT price estimation and spike detection. The consolidated benchmark reports a Chronos + XGBoost hybrid at $12.13/MWh MAE.">
   <meta name="keywords" content="electricity price forecasting, ERCOT, price spikes, time series foundation models, Chronos, XGBoost, news sentiment, GDELT, energy markets, multimodal forecasting">
   <meta name="author" content="Rohan Fozdar">
   <meta name="robots" content="index, follow">
@@ -16,9 +16,9 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Knox College">
   <meta property="og:title" content="A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals">
-  <meta property="og:description" content="Next-hour ERCOT electricity price forecasting across 13 model configurations. A Chronos + XGBoost hybrid reaches $12.13/MWh MAE and 61% spike recall on 2024 data.">
-  <meta property="og:url" content="https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/">
-  <meta property="og:image" content="https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/static/images/social_preview.png">
+  <meta property="og:description" content="Retrospective hourly ERCOT price estimation and spike detection. The consolidated benchmark reports a Chronos + XGBoost hybrid at $12.13/MWh MAE.">
+  <meta property="og:url" content="https://github.com/rohanfozdar/Electricity-Price-Forecaster">
+  <meta property="og:image" content="static/images/social_preview.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="A Multimodal Framework for Electricity Price Forecasting - Research Preview">
@@ -30,8 +30,8 @@
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="A Multimodal Framework for Electricity Price Forecasting Using Sentiment-Augmented Time-Series Signals">
-  <meta name="twitter:description" content="Next-hour ERCOT electricity price forecasting across 13 model configurations. A Chronos + XGBoost hybrid reaches $12.13/MWh MAE and 61% spike recall on 2024 data.">
-  <meta name="twitter:image" content="https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/static/images/social_preview.png">
+  <meta name="twitter:description" content="Retrospective hourly ERCOT price estimation and spike detection. The consolidated benchmark reports a Chronos + XGBoost hybrid at $12.13/MWh MAE.">
+  <meta name="twitter:image" content="static/images/social_preview.png">
   <meta name="twitter:image:alt" content="A Multimodal Framework for Electricity Price Forecasting - Research Preview">
 
   <!-- Academic/Research Specific -->
@@ -39,7 +39,7 @@
   <meta name="citation_author" content="Fozdar, Rohan">
   <meta name="citation_publication_date" content="2026">
   <meta name="citation_conference_title" content="Knox College Mathematics Capstone">
-  <meta name="citation_pdf_url" content="https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/static/pdfs/paper.pdf">
+  <meta name="citation_pdf_url" content="static/pdfs/paper.pdf">
 
   <!-- Additional SEO -->
   <meta name="theme-color" content="#1f4e79">
@@ -108,10 +108,10 @@
       "@type": "Organization",
       "name": "Knox College"
     },
-    "url": "https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/",
-    "image": "https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/static/images/social_preview.png",
+    "url": "https://github.com/rohanfozdar/Electricity-Price-Forecaster",
+    "image": "static/images/social_preview.png",
     "keywords": ["electricity price forecasting", "ERCOT", "price spikes", "time series foundation models", "news sentiment", "gradient boosting"],
-    "abstract": "Electricity prices in ERCOT are heavy-tailed: most hours trade near $21/MWh while a small number of grid-stress hours reach the $9,000/MWh regulatory cap. This work asks whether multimodal signals, and news sentiment in particular, improve next-hour price forecasting in a market dominated by rare extreme events. Eight data sources are combined into an hourly matrix of 77,956 observations and 87 features spanning 2016 to 2024, and thirteen model configurations are benchmarked under one chronological split. A hybrid that feeds a zero-shot Chronos forecast into XGBoost performs best, reaching a mean absolute error of $12.13/MWh with 61.4% spike recall on the held-out 2024 test year.",
+    "abstract": "Electricity prices in ERCOT are heavy-tailed: most hours trade near $21/MWh while a small number of grid-stress hours reach the regulatory cap. This work studies retrospective hourly price estimation and spike detection on a matrix of 77,956 observations and 87 features spanning 2016 to 2024. The consolidated project benchmark reports a Chronos plus XGBoost hybrid at $12.13/MWh MAE with 61.4% spike recall on the 2024 test year. That table was assembled across experiment versions and is not a single frozen rerun.",
     "isAccessibleForFree": true,
     "about": [
       {
@@ -164,23 +164,12 @@
                 </span>
 
                 <span class="link-block">
-                  <a href="https://github.com/rohanfozdar/Electricity-Spot-Price-Forecaster" target="_blank"
+                  <a href="https://github.com/rohanfozdar/Electricity-Price-Forecaster" target="_blank"
                      class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
                       <i class="fab fa-github"></i>
                     </span>
                     <span>Code</span>
-                  </a>
-                </span>
-
-                <!-- TODO: replace SCHOLAR_ID with your Google Scholar user id. -->
-                <span class="link-block">
-                  <a href="https://scholar.google.com/citations?user=SCHOLAR_ID" target="_blank"
-                     class="external-link button is-normal is-rounded is-dark">
-                    <span class="icon">
-                      <i class="fas fa-graduation-cap"></i>
-                    </span>
-                    <span>Scholar</span>
                   </a>
                 </span>
 
@@ -211,8 +200,7 @@
       <img src="static/images/teaser.png" alt="ERCOT hub-average price through the 2024 test year, with the 114 spike hours above $200/MWh marked, and a one-week zoom on the annual peak of $4,981/MWh" width="100%"/>
       <h2 class="subtitle has-text-centered">
         The 2024 held-out test year. Most hours trade near the median of $21/MWh, but 114 hours
-        exceed $200/MWh and the annual peak reaches $4,981/MWh. Forecasting the average hour is
-        easy; the value is in the tail.
+        exceed $200/MWh and the annual peak reaches $4,981/MWh. The value of the record is in the tail.
       </h2>
     </div>
   </div>
@@ -235,23 +223,20 @@
             conditions.
           </p>
           <p>
-            This project asks whether multimodal signals, and news sentiment in particular, improve
-            next-hour forecasts of the ERCOT real-time hub-average price. Eight data sources, namely
-            real-time and day-ahead prices, system load, weather across five zones, natural gas
-            prices and storage, nuclear reactor outages, and GDELT news sentiment, are assembled
-            into an hourly matrix of 77,956 observations and 87 engineered features covering 2016
-            through 2024. Thirteen model configurations are benchmarked under one strictly
-            chronological split, spanning gradient-boosted trees, deep sequence models, zero-shot
-            time-series foundation models, classical statistical baselines, and hybrids of the two.
+            The executed benchmark is retrospective hourly estimation of the ERCOT real-time
+            hub-average price, together with spike detection above $200/MWh. Same-hour archived
+            market variables and historical reanalysis are present, so these runs are not a
+            point-in-time next-hour forecast. Eight data sources, namely real-time and day-ahead
+            prices, system load, weather across five zones, natural gas prices and storage, nuclear
+            reactor outages, and GDELT news sentiment, are assembled into an hourly matrix of 77,956
+            observations and 87 engineered features covering 2016 through 2024.
           </p>
           <p>
-            The strongest configuration is neither purely supervised nor purely zero-shot. Feeding a
-            frozen Chronos forecast into XGBoost as a single additional feature yields a mean
-            absolute error of $12.13/MWh and 61.4% spike recall on the held-out 2024 test year,
-            ahead of the best standalone supervised model at $13.75/MWh. Removing sentiment features
-            degrades accuracy, and the direction of that effect reproduces from this codebase,
-            though the published margin does not - a discrepancy documented rather than smoothed
-            over.
+            The consolidated project benchmark reports a Chronos forecast passed into XGBoost as the
+            lowest-error configuration, at $12.13/MWh MAE and 61.4% spike recall on the 2024 test
+            year. That table was assembled across experiment versions. The matched GDELT ablation,
+            preserved in the XGBoost notebook, reduces MAE from $24.64 to $22.21 (9.9%). An earlier
+            capstone row of $34.53 versus $24.43 is a different comparison.
           </p>
         </div>
       </div>
@@ -299,8 +284,9 @@
         <h2 class="title is-3">Results</h2>
         <div class="content">
           <p class="has-text-justified">
-            All metrics are computed on the held-out 2024 test year. Spike metrics use a threshold of
-            $200/MWh. The table below is the results table from the capstone paper.
+            Reported consolidated capstone comparison on the 2024 test year. Spike metrics use a
+            threshold of $200/MWh. The no-sentiment row is an unmatched historical comparison, not
+            the matched GDELT ablation (MAE 24.64 without GDELT, 22.21 with GDELT).
           </p>
           <div class="table-container">
           <table class="table is-fullwidth is-striped is-hoverable">
@@ -398,8 +384,8 @@
         <div class="item">
           <img src="static/images/leaderboard_mae.png" alt="Horizontal bar chart of test MAE for all 13 model configurations, with the Chronos hybrid lowest at 12.13 dollars per MWh" loading="lazy"/>
           <h2 class="subtitle has-text-centered">
-            Test MAE across all 13 configurations. The hybrid leads, and tree ensembles outperform
-            the deep sequence models on this dataset.
+            Reported test MAE from the consolidated capstone comparison, including an unmatched
+            no-sentiment row. Chronos–XGBoost is the lowest reported error in that table.
           </h2>
         </div>
         <div class="item">
@@ -412,8 +398,8 @@
         <div class="item">
           <img src="static/images/sentiment_ablation.png" alt="Grouped bar chart comparing the paper's sentiment ablation with the re-run from this repository" loading="lazy"/>
           <h2 class="subtitle has-text-centered">
-            The sentiment ablation, as published and as re-run from this repository. The direction
-            holds in both; the margin is 29.3% in the paper and 22.0% on re-run.
+            Matched XGBoost ablation from the saved notebook: MAE 24.64 without GDELT and 22.21 with
+            GDELT, a 9.9% reduction. The capstone pair 34.53 to 24.43 is a different run.
           </h2>
         </div>
         <div class="item">
@@ -446,26 +432,24 @@
         <div class="content has-text-justified">
           <ol>
             <li>
-              <b>The best model is neither purely supervised nor purely zero-shot.</b> Chronos
-              contributes a univariate temporal forecast; XGBoost contributes the physical, market,
-              weather, outage, and sentiment context. Together they reach $12.13/MWh MAE, ahead of
-              either component alone.
+              <b>The consolidated benchmark reports Chronos–XGBoost as the lowest-error configuration.</b>
+              Chronos contributes a univariate temporal forecast; XGBoost contributes the physical,
+              market, weather, outage, and sentiment context. The reported MAE is $12.13/MWh.
             </li>
             <li>
-              <b>CatBoost is the strongest standalone model</b> at $13.75/MWh, and gradient-boosted
-              trees as a family handle ERCOT's nonlinear interactions better than the deep models
-              tested here.
+              <b>CatBoost is the strongest standalone model in that same table</b> at $13.75/MWh.
+              The saved CatBoost notebook is a different run (MAE $20.90 on 63 features).
             </li>
             <li>
-              <b>News sentiment carries signal.</b> GDELT tone is the highest-gain single feature in
-              the 87-feature model, and removing the sentiment family degrades MAE in every
-              configuration tested.
+              <b>The matched GDELT ablation lowers MAE and raises precision.</b> Saved notebook
+              output moves MAE from $24.64 to $22.21 and precision from 24.81% to 30.24%, while
+              recall falls from 57.89% to 54.39%.
             </li>
             <li>
-              <b>Deep learning underperformed.</b> The LSTM is competitive on MAE but misses most
-              spikes, and the Temporal Fusion Transformer records zero spike recall on 2024. Spike
-              behaviour is rare and event-driven, which suits trees and hurts models that need many
-              examples of the phenomenon.
+              <b>The deep sequence models in this comparison miss most spikes.</b> On the
+              consolidated table the LSTM recall is 16.67% and the Temporal Fusion Transformer
+              recall is 0%. Saved notebook outputs differ (LSTM MAE $32.45, TFT MAE $25.61) and
+              still show low spike recall.
             </li>
             <li>
               <b>Spike prediction is a tradeoff, not a single score.</b> Recall and precision trade
@@ -492,26 +476,18 @@
             The repository ships the canonical feature matrix, so a fresh clone can train and
             evaluate without re-pulling any primary source or holding any API key:
           </p>
-          <pre><code>git clone https://github.com/rohanfozdar/Electricity-Spot-Price-Forecaster.git
-cd Electricity-Spot-Price-Forecaster
+          <pre><code>git clone https://github.com/rohanfozdar/Electricity-Price-Forecaster.git
+cd Electricity-Price-Forecaster
 pip install -e .
 python run_full_pipeline.py --stage models</code></pre>
           <p>
-            Two caveats are stated plainly rather than buried. First, the published
-            <i>no-sentiment</i> ablation figure of $34.53/MWh does not regenerate from this
-            codebase: re-running it four ways, across two feature matrices with and without the
-            log1p transforms, puts that number between $22.17 and $24.58 every time. The
-            conclusion survives, since a like-for-like comparison still shows sentiment reducing
-            MAE by 22.0%, but the specific published pair should be read as the paper's record.
-            Second, the Chronos backfill required for the hybrid is roughly 77,400 forward passes
-            and has not yet been completed end-to-end on the machine used to prepare this
-            repository, so the headline $12.13/MWh is likewise the paper's record. The script that
-            reproduces it, <code>models/train_chronos_hybrid.py</code>, checkpoints and resumes.
-          </p>
-          <p>
-            Seven of the thirteen configurations, namely CatBoost, NGBoost, LSTM, TFT, TimesFM,
-            Prophet, and SARIMAX, were verified by code inspection rather than re-executed for this
-            release, and the runtime estimates in the repository README are approximate.
+            <code>--stage models</code> trains the XGBoost script family. It does not reproduce the
+            twelve-model table. The matched GDELT ablation is the saved output of
+            <code>notebooks/01_xgboost.ipynb</code>: MAE $24.64 without GDELT and $22.21 with GDELT.
+            The capstone pair $34.53 versus $24.43 is a different comparison. A later script re-run
+            reported MAE $24.58 and $19.17. The Chronos hybrid cells in the notebook were not
+            executed; <code>models/train_chronos_hybrid.py</code> is the script form and has not
+            been completed end-to-end here, so $12.13/MWh remains the consolidated reported figure.
           </p>
         </div>
       </div>
@@ -537,7 +513,7 @@ python run_full_pipeline.py --stage models</code></pre>
   author = {Fozdar, Rohan},
   year   = {2026},
   note   = {Mathematics Capstone, Knox College},
-  url    = {https://rohanfozdar.github.io/Electricity-Spot-Price-Forecaster/}
+  url    = {https://github.com/rohanfozdar/Electricity-Price-Forecaster}
 }</code></pre>
     </div>
 </section>
