@@ -1,0 +1,30 @@
+{
+  "units": "$/MWh",
+  "fit_window": "calendar 2023",
+  "n_fit_rows": 8760,
+  "rule": "unpenalized quantile regression at tau 0.5, intercept allowed, weights not constrained to be positive or to sum to 1",
+  "selected_because": "lowest 2023 MAE among the median, the simplex weighted mean, and this regression",
+  "components": [
+    "day_ahead",
+    "persistence",
+    "lear",
+    "chronos_zero_shot",
+    "honest_tree"
+  ],
+  "component_files": {
+    "day_ahead": "predictions/dam.parquet",
+    "persistence": "predictions/persistence.parquet",
+    "lear": "predictions/lear.parquet",
+    "chronos_zero_shot": "predictions/chronos_zero_shot.parquet",
+    "honest_tree": "predictions/honest_tree.parquet"
+  },
+  "weights": [
+    -0.04855996013392374,
+    -0.2006224730968082,
+    0.516222432611746,
+    0.10954905833401914,
+    0.8669434315113034
+  ],
+  "intercept": -4.40792754681336,
+  "source": "runs/benchmark/selected_ensemble.json candidate qra_tau_0.5"
+}

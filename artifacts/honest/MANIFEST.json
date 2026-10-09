@@ -1,0 +1,90 @@
+{
+  "booster_replay": "2024 predictions match the reloaded booster to $0.000000/MWh on 8767 hours",
+  "stack_rebuild": "rebuilt forecast matches predictions/ensemble.parquet to $0.000000/MWh",
+  "not_committed": [
+    "LEAR intercept, coefficients, and StandardScaler mean/scale: never written; a refit would be required",
+    "Chronos-T5 checkpoint: public model amazon/chronos-t5-small, not redistributed",
+    "Other runs/benchmark boosters and intermediate files",
+    "Raw ERCOT, weather, gas, and GDELT downloads"
+  ],
+  "files": [
+    {
+      "path": "honest_tree_fit.json",
+      "bytes": 2595,
+      "sha256": "d685378ec567a8fd70cd7d7fe7245af714587db1e1c3c098e855344afbe162cb",
+      "what": "Feature names, best_iteration 494, and the improved-hybrid config used by the booster."
+    },
+    {
+      "path": "honest_tree_model.json",
+      "bytes": 3056723,
+      "sha256": "5ce0eccf513216221e1f69ca02b017665d952f40fc86616722e1939a104ea868",
+      "what": "XGBoost native JSON booster. 494 trees kept. Reproduces 2024 honest-tree forecasts; replay max abs error $0."
+    },
+    {
+      "path": "lear_coefficients_absent.json",
+      "bytes": 861,
+      "sha256": "58a11dc5c5132aff3cb981cfd2d0836a726679e078fe9ff90176a15793d5d681",
+      "what": "Record that the Lasso weights and scaler were never written."
+    },
+    {
+      "path": "lear_selection.json",
+      "bytes": 1544,
+      "sha256": "6a7d53d92c2efb4e91ffa880112c7b0cec77546c5c2f52290aad5d91df3d71d8",
+      "what": "Lasso alpha grid and the chosen alpha 0.01. Not the coefficient vector."
+    },
+    {
+      "path": "predictions/chronos_zero_shot.parquet",
+      "bytes": 358281,
+      "sha256": "238378ca55cc1b71638aea3929b80fa331a43838639dbf86e802ae69d13fe457",
+      "what": "Existing Chronos zero-shot forecast, not refit. 2024 MAE 14.54."
+    },
+    {
+      "path": "predictions/dam.parquet",
+      "bytes": 275653,
+      "sha256": "95788769529f76368198d0f8e16a5e3a51afc990569dde05ae7f1a47f1442679",
+      "what": "Day-ahead price used as a forecast. 2024 MAE 17.51."
+    },
+    {
+      "path": "predictions/ensemble.parquet",
+      "bytes": 394384,
+      "sha256": "4283ff81bb2509c13735abcfd2a4c0f7aa290c7fcfd76447c3d86955407bfe98",
+      "what": "Quantile stack forecasts. 2024 MAE 12.13."
+    },
+    {
+      "path": "predictions/honest_tree.parquet",
+      "bytes": 324181,
+      "sha256": "6b0b5af9d847cda82a29dacfd1f51d432d3b8b28b9e3f8140199c3ab154f477e",
+      "what": "2023 and 2024 rows: split, y_true, y_pred. 2024 MAE 11.56."
+    },
+    {
+      "path": "predictions/lear.parquet",
+      "bytes": 394384,
+      "sha256": "d719338f428c3b51cc00be79a025cb56111517b24f1e500fcbad5872e714d2b7",
+      "what": "2023 and 2024 rows: split, y_true, y_pred. 2024 MAE 13.39."
+    },
+    {
+      "path": "predictions/persistence.parquet",
+      "bytes": 279471,
+      "sha256": "4722f9f1f73e182316afe4e1a19bfa9bf7d1a88e6aebc078ed8da896a19e57c4",
+      "what": "Persistence forecasts. 2024 MAE 17.04."
+    },
+    {
+      "path": "predictions/unshifted.parquet",
+      "bytes": 324173,
+      "sha256": "8456dd44565d75f4ed2b7c909826b5312b10c250cdd1607d5d5ce3180317d9f5",
+      "what": "Improved hybrid, seed 42, original features. 2024 MAE 12.95."
+    },
+    {
+      "path": "predictions/weather_lag_1.parquet",
+      "bytes": 324121,
+      "sha256": "654b54b210e31c1102256b5d0207253e06a6294fcf62cc95a8f28ee1246a0dfb",
+      "what": "Same setup with weather lagged one hour only. 2024 MAE 12.96."
+    },
+    {
+      "path": "stack_coefficients.json",
+      "bytes": 964,
+      "sha256": "9d4821d409f0c58f143fec0513fa4fa5a8b915d9cfbb51f334d8db4d625667dc",
+      "what": "Quantile-stack intercept and five weights. Rebuilds predictions/ensemble.parquet with max abs error $0."
+    }
+  ]
+}

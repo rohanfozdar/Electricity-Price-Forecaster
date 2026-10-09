@@ -1,0 +1,13 @@
+{
+  "saved": false,
+  "reason": "The Lasso was fit in memory and only the 2024 and 2023 predictions were written. No pickle, joblib, or coefficient vector exists on disk. Reconstructing the intercept, coefficients, and standardization vectors would require a refit, which this packaging pass does not do.",
+  "what_is_saved": "predictions/lear.parquet has split, y_true, and y_pred. lear_selection.json records alpha 0.01 and the 2022 penalty grid.",
+  "alpha": 0.01,
+  "target": "asinh(price), predictions clipped to asinh +/- 10 then mapped with sinh",
+  "features": [
+    "asinh of HB_HUBAVG at t-1, t-24, and t-168",
+    "asinh of the same-hour day-ahead hub price",
+    "hour, day-of-week, and month dummies in US/Central"
+  ],
+  "standardization": "StandardScaler fit on the pre-2023 rows used for the final refit. The mean and scale were not written."
+}
