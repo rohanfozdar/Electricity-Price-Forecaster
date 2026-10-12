@@ -1,6 +1,6 @@
 # ERCOT Electricity Price Forecasting
 
-This study forecasts the hourly ERCOT real-time hub-average price one hour ahead. The target for hour t is `HB_HUBAVG`, the maximum of the four 15-minute hub-average settlement prices inside that hour. On the 2024 test year the gradient-boosted model has mean absolute error $11.56/MWh. Two other forecasts are reported with it: a Lasso on price lags and the day-ahead price (LEAR), and a quantile stack of five forecasts.
+This study forecasts the hourly ERCOT real-time hub-average price one hour ahead. The target for hour t is `HB_HUBAVG`, the maximum of the four 15-minute hub-average settlement prices inside that hour. On the 2024 test year the Chronos-Augmented XGBoost model has mean absolute error $11.56/MWh. Two other forecasts are reported with it: a Lasso on price lags and the day-ahead price (LEAR), and a quantile stack of five forecasts.
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue?style=flat-square)](pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
