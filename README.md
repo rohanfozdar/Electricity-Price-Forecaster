@@ -13,7 +13,7 @@ The test year is 8,767 hours, from 2024-01-01 00:00 UTC through 2024-12-31 06:00
 
 | Model | MAE | RMSE | Spike recall | Spike precision |
 | --- | ---: | ---: | ---: | ---: |
-| Gradient-boosted tree | 11.56 | 99.96 | 50.00% (57 of 114) | 73.08% (57 of 78) |
+| Chronos-Augmented XGBoost | 11.56 | 99.96 | 50.00% (57 of 114) | 73.08% (57 of 78) |
 | Quantile stack | 12.13 | 96.23 | 53.51% (61 of 114) | 64.21% (61 of 95) |
 | LEAR | 13.39 | 97.92 | 34.21% (39 of 114) | 61.90% (39 of 63) |
 | Chronos zero-shot | 14.54 | 113.62 | 41.23% | 61.04% |
