@@ -1,0 +1,204 @@
+% Standalone, single-file manuscript. Compile with pdflatex twice.
+% This manuscript reports the corrected, frozen 2019--2024 experiment only.
+% No additional experiments were conducted in preparing this LaTeX file.
+\documentclass[11pt,letterpaper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage{booktabs,tabularx,array,multirow}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{natbib}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=NavyBlue,citecolor=NavyBlue,urlcolor=NavyBlue]{hyperref}
+\usepackage[nameinlink,noabbrev]{cleveref}
+\setlength{\parindent}{1.05em}
+\setlength{\parskip}{0.22em}
+\setlength{\emergencystretch}{3em}
+\captionsetup{font=small,labelfont=bf}
+\renewcommand{\arraystretch}{1.12}
+\newcommand{\MWh}{\ensuremath{\mathrm{MWh}}}
+\newcommand{\USD}{\ensuremath{\mathrm{USD}}}
+\newcommand{\MAE}{\ensuremath{\mathrm{MAE}}}
+\newcommand{\RMSE}{\ensuremath{\mathrm{RMSE}}}
+\newcommand{\Chronos}{\textsc{Chronos}}
+\newcommand{\XGB}{\textsc{XGBoost}}
+\newcommand{\given}{\mathrel{|}}
+
+\title{\bfseries How Much Do Frozen Time-Series Foundation Models Add to Electricity Price Forecasts?\\[0.25em]
+\large A Publication-Delay-Constrained Evaluation on ERCOT}
+\author{Rohan Fozdar\\[-0.1em]\normalsize Knox College\\[-0.1em]\normalsize \href{mailto:rfozdar@knox.edu}{rfozdar@knox.edu}}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+A pretrained time-series foundation model can be added to a conventional forecaster at little architectural cost, but the resulting improvement must be separated from information-timing advantages and ordinary fitting variability. We study whether six statistics derived from a frozen \Chronos--T5-small model improve \XGB\ forecasts of the maximum 15-minute real-time hub-average price within the next ERCOT trading hour. Our retrospective design trains on 2019--2022, uses 2023 for validation, and evaluates on 8,767 hours in 2024. Both models use matched features, training rows, seeds, and hyperparameters; the augmented model alone receives \Chronos\ outputs generated from an explicitly delayed 512-hour price history. Under an assumed one-hour posting delay for archived real-time prices and realized load, the mean absolute error of five-seed averaged forecasts is \$14.92/\MWh\ with \Chronos\ and \$15.07/\MWh\ without it. The paired improvement of \$0.15/\MWh\ is not statistically distinguishable from zero (95\% 24-hour moving-block bootstrap interval for augmented minus baseline MAE: [\$-0.32,\ \$0.06]/\MWh; bootstrap $p=0.131$; Diebold--Mariano $p=0.124$). This interpretation is unchanged by publication-delay, block-length, and target-completeness checks. A separate pre-2021-fit stress evaluation finds that both tree models severely underestimate prices during the February 2021 Texas electricity crisis, although they outperform latency-valid persistence outside that episode. Our results do not demonstrate a reliable incremental benefit from frozen \Chronos\ features for this target. They also identify two obstacles to stronger operational claims: archived settlement prices are not verified first-publication vintages, and the assumed availability of hourly realized load has not been established from historical posting records.
+\end{abstract}
+
+\noindent\textbf{Keywords:} electricity price forecasting; ERCOT; time-series foundation models; \Chronos; gradient-boosted trees; forecast evaluation; publication latency; distribution shift.
+
+\section{Introduction}\label{sec:intro}
+Wholesale electricity prices are difficult to predict not because they lack short-run structure, but because the structure can change abruptly. Daily and weekly patterns coexist with negative prices, transmission constraints, unexpected generator outages, and rare scarcity events. In such settings, a model that is accurate in ordinary hours can be wrong by several thousand dollars per megawatt-hour when the system is stressed. A useful evaluation must therefore ask two questions: how much error a model makes under a common information set, and how that error behaves when the market departs from normal conditions.
+
+Pretrained time-series foundation models offer a potentially attractive source of additional information. Rather than train a separate neural architecture on the market under study, a practitioner can generate a forecast with a frozen model and pass summaries of its predictive distribution to a task-specific learner. \Chronos\ is one such model: it transforms numerical observations into a token sequence and learns probabilistic forecasts with pretrained transformer architectures \citep{ansari2024chronos}. The computational recipe is straightforward, but the inferential question is not. If a gradient-boosted tree already receives autoregressive prices, known day-ahead prices, calendar indicators, and other admissible regressors, does the frozen model contribute information those inputs do not already capture?
+
+This question is particularly sensitive to \emph{when} the regressors become available. An archived real-time settlement price carries the timestamp of the market interval to which it refers; that timestamp is not necessarily the time the price was first posted. The final archived value can also incorporate subsequent revisions. Treating interval timestamps as publication timestamps may supply a retrospective model with information that a real forecaster did not possess. These concerns are not fixed by shifting columns mechanically unless the source, timestamp convention, and derived features are examined together. The need for temporally defensible features and comparable baselines has long been emphasized in electricity-price forecasting research \citep{lago2021review}.
+
+We evaluate frozen \Chronos--T5-small features as an addition to \XGB\ \citep{chen2016xgboost} for one-hour-ahead forecasts of the \emph{hourly maximum} of ERCOT's 15-minute hub-average real-time settlement-point prices. The maximum, rather than the hourly mean, retains short-lived extreme realizations that would otherwise be smoothed by aggregation. Our primary comparison uses identical forecast origins and non-\Chronos\ inputs, a fixed 2019--2022 training period, 2023 validation, five matched random seeds, and a frozen 2024 retrospective index. It imposes a one-hour delay after hour-end on real-time prices and realized load and evaluates longer assumed delays separately. Crucially, these delays are modeling assumptions; no historical first-publication archive is available to verify them.
+
+Three findings emerge. First, the primary \Chronos\ augmentation decreases mean absolute error by \$0.15/\MWh, but the 95\% block-bootstrap interval includes zero and the paired predictive-accuracy test does not reject equal performance. Second, this inference survives alternative delay assumptions and dependence horizons, while a stronger latency-matched autoregressive benchmark makes clear that model rankings depend on whether MAE or RMSE is emphasized. Third, a February 2021 stress evaluation shows a dramatic reversal: a legally lagged persistence forecast outperforms both tree models during the crisis, despite the trees' advantage outside it. This comparison is diagnostic, not a claim that persistence is uniformly preferable.
+
+The contribution is an empirical examination of \emph{incremental foundation-model information} under explicit feature-availability constraints, not a new forecasting architecture. A small estimated gain with substantial uncertainty is a valid outcome of that examination. We report the uncertainty, the vulnerable regimes, and the limitations of historical data provenance rather than construing a modest point estimate as evidence of superiority.
+
+\section{Related Work}\label{sec:related}
+\paragraph{Electricity-price forecasting.} The literature contains regularized autoregressive regressions, boosted trees, neural networks, and combinations of point forecasts. \citet{lago2021review} argue for multi-year evaluation, strong conventional benchmarks, transparent datasets, and formal tests of predictive accuracy. Their open-access comparison focuses on day-ahead prices, whereas our outcome is the maximum within an ERCOT real-time hour. The different market product, horizon, and target aggregation prevent numerical performance comparisons across these studies. Our benchmark suite includes seasonal rules, latency-valid persistence, and a regularized high-dimensional autoregressive model. The last is \emph{LEAR-style}; it is not asserted to reproduce the exact LEAR specification of \citet{lago2021review}.
+
+\paragraph{Foundation-model augmentation.} \Chronos\ learns to model time-series tokens using a T5-family architecture and produces samples from a predictive distribution \citep{ansari2024chronos}. Point summaries, interval summaries, and a forecast's implied exceedance frequency can be useful covariates for a second-stage model. Passing these quantities into a tree is a feature-augmentation or stacking strategy; freezing the pretrained model does not turn the combination into a novel end-to-end architecture. Moreover, good zero-shot performance in broad benchmarks does not imply that foundation-model summaries add value after a local supervised model has been trained on rich domain covariates. The appropriate test is a matched ablation conditional on the existing feature set.
+
+\paragraph{Evaluation under dependence.} Hourly forecast errors are dependent, especially across persistent price regimes and weather events. Naively treating each hour as an independent observation can make an estimated difference appear much more precise than it is. We pair forecast losses at common origins, use moving-block resampling for the primary uncertainty interval, and report a Diebold--Mariano predictive-accuracy comparison \citep{diebold1995,harvey1997}. These procedures quantify sampling uncertainty in the evaluated loss series; they cannot repair data vintages or make a previously inspected evaluation year untouched.
+
+\section{Forecasting Problem and Data}\label{sec:data}
+\subsection{Target, origin, and observation unit}
+Let $t$ denote the beginning of a UTC clock hour, and let $p_{t,j}$ be the archived HB\_HUBAVG real-time settlement-point price for the 15-minute interval starting at $t+15j$ minutes, $j\in\{0,1,2,3\}$. The primary target is
+\begin{equation}\label{eq:target}
+  y_t = \max_{j\in\mathcal J_t}p_{t,j}, \qquad
+  \mathcal J_t\subseteq\{0,1,2,3\},\quad \mathcal J_t\ne\varnothing,
+\end{equation}
+where $\mathcal J_t$ contains the intervals present in the archive. In a complete hour, $\mathcal J_t=\{0,1,2,3\}$. This definition is deliberately explicit about incomplete hours: the frozen evaluation retains an hour with at least one valid 15-minute observation instead of silently interpreting every retained maximum as the maximum of four observations. The forecast $\hat y_t$ is issued at the beginning of hour $t$, before any component of $y_t$ is realized. This is a forecast of the forthcoming hour's maximum price, not a next-day auction-price forecast.
+
+The archive stores interval starts in UTC. We use \texttt{US/Central} to derive market-local calendar predictors, including the local hour and day of week, so daylight-saving transitions are handled as local-market events. The UTC hourly target still identifies the same one-hour physical window because the Central--UTC offset changes by whole hours.
+
+\subsection{Sample construction and chronological split}
+The principal design uses 2019--2022 for training, 2023 for validation and early stopping, and 2024 for retrospective evaluation. The 2024 evaluation index is a fixed set of 8,767 hours, with the first 8,766 hours having complete target observations and the final retained hour incomplete. The source series ends within \texttt{2024-12-31 06:00 UTC}; only one of its four 15-minute observations is present. The next 17 UTC hours, \texttt{2024-12-31 07:00} through \texttt{23:00}, have no source prices and are therefore absent. Calendar year 2024 contains 8,784 UTC hours. The evaluation consequently does \emph{not} cover the entire final UTC day. No post-2024 data are appended to fill that gap.
+
+The evaluation index was inspected during earlier development. We therefore characterize the 2024 results as a \emph{retrospective evaluation on a frozen index}, not an untouched prospective test. The target-completeness sensitivity study refits both models on the common complete-hour set of 8,766 observations without replacing the designated primary comparison. Results from different historical model configurations are not used as direct competitors unless their information sets and test origins are matched.
+
+\subsection{Archived sources and availability assumptions}
+The price series is drawn from ERCOT's historical real-time hub and load-zone archive, product NP6-785-ER (report 13061) \citep{ercotarchive}. The ERCOT 15-minute publication product NP6-905-CD is a distinct data product \citep{ercotlive}; the experiment does not preserve a historical record of its first posting time. Realized load comes from ERCOT's daily actual-load-by-weather-zone archive NP6-345-CD (report 13101) \citep{ercotload}. These archives identify observations, not necessarily the values and posting times an online forecaster would have seen.
+
+We therefore distinguish three statuses: a documented release gate with uncertain historical exceptions; an explicitly assumed delay; and an input without adequate release-time evidence, which is excluded. Day-ahead hub prices enter no earlier than 14:00 US/Central on the prior local operating day, a buffer after the nominal 13:30 posting deadline. Weekly EIA storage features enter no earlier than the following Friday at 18:00 UTC, later than the ordinary Thursday 10:30 Eastern release \citep{eiaschedule,eiaexplainer}. Archived day-ahead corrections and historical holiday exceptions have not been reconstructed at the row level. Unverified archive weather, same-date gas values, and nuclear-outage status are omitted from the principal feature set rather than assigned speculative publication times.
+
+\begin{table}[t]
+\centering\small
+\caption{Information set at the start of target hour $t$. Delays are interpreted relative to the completion of the relevant observation, not simply as row shifts.}\label{tab:availability}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.45cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{2.45cm}@{}}
+\toprule
+Input family & Primary admissibility rule & Evidence status \\
+\midrule
+Real-time HB\_HUBAVG & Last complete hour $t-2$; older lags and rolling statistics end no later than that hour. & One-hour after-end delay assumed; archive may be revised. \\
+\paragraph{Scope of generalization.} The principal evaluation is confined to one ERCOT hub-average series, one maximum-price outcome, one frozen foundation-model checkpoint, one supervised model family, and one previously inspected evaluation year. HB\_NORTH probes within-market spatial variation, not independent-market transport. The 2021 episode illustrates sensitivity to rare regimes but provides only one realized crisis; alternative disaster periods and markets may produce different rankings. Results for the hourly mean do not license changing the primary outcome after observing the 2024 maximum-target result. These boundaries should shape both the contribution statement and any extrapolation to dispatch, hedging, or trading decisions.
+
+\paragraph{Loss functions and decision value.} Low MAE does not by itself imply low economic risk during price scarcity. RMSE gives much greater weight to the largest misses, and a model with better MAE can still have worse RMSE, as observed against the LEAR-style benchmark. The \$200 exceedance diagnostics reveal low recall for both tree models. A trading or operations study would need an explicit action, cost, settlement exposure, and risk tolerance; this study does not estimate trading returns, calibrate rare-event probabilities, or validate a decision policy. Such claims would require new, separately defined experiments.
+
+\paragraph{Statistical interpretation and researcher degrees of freedom.} Block-bootstrap intervals and predictive-accuracy tests address dependence in forecast errors conditional on the supplied evaluation series. They do not turn a previously inspected retrospective year into pristine confirmatory evidence, establish correct source vintages, or correct automatically for examining multiple secondary outcomes. We accordingly preserve the fixed primary gap, mark subsidiary analyses exploratory, and disclose rather than hide the one incomplete target hour. The confidence interval is compatible with both a modest improvement and a small deterioration. The weight of evidence supports limited or uncertain incremental value in this setting, not a universal judgment about foundation models.
+
+\section{Conclusion}\label{sec:conclusion}
+Across 8,767 retrospective 2024 ERCOT hub-average hours, six frozen \Chronos--T5-small features reduce the MAE of a matched \XGB\ ensemble from \$15.07 to \$14.92/\MWh. The paired difference is small, its 95\% dependence-aware interval crosses zero, and its inference remains inconclusive under alternative delay assumptions and block lengths. A separate 2021 stress evaluation exposes a much larger practical concern: during a severe scarcity episode, both tree models greatly underpredict prices and lose decisively to latency-valid persistence, even though they outperform it outside the crisis. Together, the results argue for evaluating foundation-model augmentation through matched, availability-conscious ablations and regime-specific diagnostics, rather than by treating additional model complexity or a favorable point estimate as evidence of improvement. Stronger operational conclusions will require timestamped first-publication data, genuine historical vintages, and confirmation beyond the previously examined ERCOT setting.
+
+\section*{Data and Reproducibility Statement}
+The research repository is available at \url{https://github.com/rohanfozdar/Electricity-Price-Forecaster}. The audited branch is \texttt{pit-chronos-ablation}. The primary saved metrics are in \path{runs/pit_verified/comparisons.json}, and final audit artifacts are in \path{runs/final_audit/} with reports \texttt{01}--\texttt{10} and \path{FINAL_RESEARCH_READINESS.md} under \path{reports/final_research_audit/}. The reported frozen evaluation index contains 8,767 hours and has audit hash \texttt{b850034b0690e660}. The verification entry point is \texttt{python} \path{models/run_final_audit.py}; the audit reports 34 passing temporal, availability, and point-in-time-constraint tests. These are author-reported repository artifacts and test outcomes; the present manuscript does not claim an independent third-party reproduction. The original run directories \path{runs/pit_verified/} and \path{runs/pit_ablation/} were retained without modification during the final audit. Source-market records and publication-rule URLs are cited below. No data from 2025 or later enter the empirical comparisons in this paper.
+
+\appendix
+\section{Additional Methodological Detail}\label{app:additional}
+\subsection{Why a one-hour posting delay requires a two-hour lag}
+Let $[u,u+1\mathrm{h})$ be a complete price observation hour and suppose its archived value becomes usable $d$ hours after interval end. At issue time $t$, admissibility requires $u+1\mathrm{h}+d\mathrm{h}\leq t$. Setting $d=1$ gives $u\leq t-2\mathrm{h}$. The same rule is applied to the history provided to \Chronos; otherwise the augmented model could implicitly observe more recent outcomes than the comparator despite identical tabular price lags. For $d\in\{1,2,3,6\}$, the corresponding most recent input hours are $t-2,t-3,t-4,t-7$, and the sampled \Chronos\ forecast step is $1+d$.
+
+\subsection{Seed aggregation and the forecast-loss contrast}
+For each origin, averaging five predictions and then taking absolute error is generally not equivalent to averaging their five absolute errors:
+\begin{equation}
+\left|y_t-\frac15\sum_{s\in\mathcal S}\hat y_{t,s}\right|
+\ne \frac15\sum_{s\in\mathcal S}|y_t-\hat y_{t,s}|.
+\end{equation}
+By convexity, the expression on the left is no larger than that on the right for the same underlying forecasts. A change in the aggregation rule can therefore change a reported MAE even when no model is retrained. The paper consistently uses the left-hand estimand for its headline paired comparison and labels individual-seed scores separately.
+
+\subsection{Completeness, temporal checks, and the primary index}
+There are 8,784 clock hours in UTC 2024. The source ends within the hour starting December 31 at 06:00 UTC, leaving one observed quarter-hour in that hour. It contains no observations in the subsequent 17 clock hours. The frozen index retains the incomplete terminal maximum, but not the unobserved hours. The full-interval analysis removes this single retained incomplete hour, retaining 8,766 evaluation hours. The final audit reports exact prediction agreement with the saved forecasts on those hours after matched refits and no change to the inference that the Chronos gap is not distinguishable from zero. Automated checks cover lag cutoffs, rebuilt \Chronos\ contexts, calendar transitions, and the day-ahead and storage publication gates; these checks do not verify unavailable first-posted vintages.
+
+\section{Source Evidence and Claim Boundaries}\label{app:evidence}
+\begin{table}[h]
+\centering\small
+\caption{Provenance boundaries that affect interpretation. ``Checked'' refers to implemented timing constraints, not verification of historical first-posting timestamps.}\label{tab:limitations}
+\begin{tabularx}{\linewidth}{@{}p{2.95cm}X@{}}
+\toprule
+Evidence component & Supported claim and remaining gap\\
+\midrule
+Price / Chronos alignment & For assumed delay $d$, price and Chronos input histories end at $t-(d+1)$. Historical values are taken from a potentially revised weekly archive; actual posting time is unknown.\\
+Load availability & Current-hour load is excluded and older load is delayed; the daily realized-load archive does not verify the one-hour posting assumption.\\
+Day-ahead price & 14:00 Central gate follows the nominal 13:30 posting requirement; historical corrections are not separately identified.\\
+EIA weekly storage & Friday 18:00 UTC buffer follows ordinary weekly release; exact historical holiday exceptions were not verified row by row.\\
+Evaluation period & 2019--2022 training, 2023 validation, 2024 retrospective scoring. The 2024 index was previously inspected and ends with an incomplete final hour.\\
+Inference & Paired bootstrap and Diebold--Mariano comparisons assess 2024 loss differences conditional on archived data and the frozen protocol; neither tests equivalence nor eliminates researcher selection.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{thebibliography}{99}
+\bibitem[Ansari et~al.(2024)]{ansari2024chronos}
+A.~F. Ansari, L. Stella, A.~C. Turkmen, et~al.
+\newblock Chronos: Learning the language of time series.
+\newblock \emph{Transactions on Machine Learning Research}, 2024.
+\newblock \url{https://arxiv.org/abs/2403.07815}.
+
+\bibitem[Chen and Guestrin(2016)]{chen2016xgboost}
+T. Chen and C. Guestrin.
+\newblock XGBoost: A scalable tree boosting system.
+\newblock In \emph{Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining}, pp. 785--794, 2016.
+\newblock \url{https://doi.org/10.1145/2939672.2939785}.
+
+\bibitem[Diebold and Mariano(1995)]{diebold1995}
+F.~X. Diebold and R.~S. Mariano.
+\newblock Comparing predictive accuracy.
+\newblock \emph{Journal of Business \& Economic Statistics}, 13(3):253--263, 1995.
+\newblock \url{https://doi.org/10.1080/07350015.1995.10524599}.
+
+\bibitem[ERCOT(2026a)]{ercotarchive}
+Electric Reliability Council of Texas.
+\newblock Historical RTM load zone and hub prices (NP6-785-ER, report 13061), product catalog, accessed October 2026.
+\newblock \url{https://www.ercot.com/mp/data-products/data-product-details?id=NP6-785-ER}.
+
+\bibitem[ERCOT(2026b)]{ercotlive}
+Electric Reliability Council of Texas.
+\newblock Settlement point prices at resource nodes, hubs and load zones (NP6-905-CD, report 12301), product catalog, accessed October 2026.
+\newblock \url{https://www.ercot.com/mp/data-products/data-product-details?id=NP6-905-CD}.
+
+\bibitem[ERCOT(2026c)]{ercotload}
+Electric Reliability Council of Texas.
+\newblock Actual system load by weather zone (NP6-345-CD, report 13101), product catalog, accessed October 2026.
+\newblock \url{https://www.ercot.com/mp/data-products/data-product-details?id=NP6-345-CD}.
+
+\bibitem[EIA(2023)]{eiaexplainer}
+U.S. Energy Information Administration.
+\newblock Weekly natural gas storage report: publication schedule and market information. \emph{Today in Energy}, June 22, 2023.
+\newblock \url{https://www.eia.gov/todayinenergy/detail.php?id=56900}.
+
+\bibitem[EIA(2026)]{eiaschedule}
+U.S. Energy Information Administration.
+\newblock Weekly natural gas storage report: release schedule, accessed October 2026.
+\newblock \url{https://ir.eia.gov/ngs/schedule.html}.
+
+\bibitem[FERC and NERC(2021)]{ferc2021}
+Federal Energy Regulatory Commission and North American Electric Reliability Corporation.
+\newblock The February 2021 cold weather outages in Texas and the South Central United States: Final report, November 2021.
+\newblock \url{https://www.ferc.gov/news-events/news/final-report-february-2021-freeze-underscores-winterization-recommendations}.
+
+\bibitem[Harvey et~al.(1997)]{harvey1997}
+D. Harvey, S. Leybourne, and P. Newbold.
+\newblock Testing the equality of prediction mean squared errors.
+\newblock \emph{International Journal of Forecasting}, 13(2):281--291, 1997.
+\newblock \url{https://doi.org/10.1016/S0169-2070(96)00719-4}.
+
+\bibitem[Lago et~al.(2021)]{lago2021review}
+J. Lago, G. Marcjasz, B. De Schutter, and R. Weron.
+\newblock Forecasting day-ahead electricity prices: A review of state-of-the-art algorithms, best practices and an open-access benchmark.
+\newblock \emph{Applied Energy}, 293:116983, 2021.
+\newblock \url{https://doi.org/10.1016/j.apenergy.2021.116983}.
+\end{thebibliography}
+\end{document}

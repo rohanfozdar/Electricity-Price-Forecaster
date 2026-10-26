@@ -1,0 +1,12 @@
+total 38
+drwxr-xr-x 2 rfozdar rfozdar 18000 2026-05-06 20:01:36.000000000 -0500 .
+drwxr-xr-x 3 rfozdar rfozdar 18000 2026-05-06 20:01:32.000000000 -0500 ..
+lrwxrwxrwx 1 rfozdar rfozdar    52 2026-05-06 20:01:32.000000000 -0500 config.json -> ../../blobs/b9ce8d0e4e0eee976236d60380470d74b210328b
+lrwxrwxrwx 1 rfozdar rfozdar    52 2026-05-06 20:01:36.000000000 -0500 generation_config.json -> ../../blobs/7528dbb1b6ce860d242aff71294a5fef12a41572
+lrwxrwxrwx 1 rfozdar rfozdar    76 2026-05-06 20:01:35.000000000 -0500 model.safetensors -> ../../blobs/9c8b6fde5300f72b01c173153bf9288fa0a200614275bf0585071ad71a6a3d43
+total 180344
+drwxr-xr-x 2 rfozdar rfozdar     18000 2026-05-06 20:01:36.000000000 -0500 .
+drwxr-xr-x 3 rfozdar rfozdar     18000 2026-05-06 20:01:32.000000000 -0500 ..
+-rw-r--r-- 1 rfozdar rfozdar      1113 2026-05-06 20:01:32.000000000 -0500 config.json
+-rw-r--r-- 1 rfozdar rfozdar       142 2026-05-06 20:01:36.000000000 -0500 generation_config.json
+-rw-r--r-- 1 rfozdar rfozdar 184632480 2026-05-06 20:01:35.000000000 -0500 model.safetensors
