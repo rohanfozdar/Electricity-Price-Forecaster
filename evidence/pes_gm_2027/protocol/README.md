@@ -1,0 +1,1 @@
+Protocol v1 was frozen on 2026-10-26, before E1–E8 scoring. `models.pes2027.protocol.require_frozen()` refuses to run a scorer if `protocol_v1.yaml` is untracked, dirty, or missing from git history. Change the YAML only by a new dated version.

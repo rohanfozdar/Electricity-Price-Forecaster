@@ -1,0 +1,98 @@
+# PES GM 2027 evidence protocol v1
+# Frozen 2026-10-26 before any new scoring (E1-E8).
+# Runners call models.pes2027.protocol.require_frozen() and refuse to run
+# unless this file is tracked, unmodified, and committed.
+
+name: pes-gm-2027-protocol-v1
+frozen_utc: "2026-10-26T00:00:00Z"
+study_label: archived-data evaluation under assumed delays
+venue: IEEE PES General Meeting 2027
+later_years_rule: pre-2025 data only
+gpu: "0"
+do_not_write:
+  - runs/pit_verified
+  - runs/pit_ablation
+  - runs/final_audit
+  - reports/final_research_audit
+
+primary:
+  target: hourly max of HB_HUBAVG 15-minute prices, interval-start UTC
+  delay_hours: 1
+  evaluation_index_hash: b850034b0690e660
+  train: "2019-01-01/2022-12-31"
+  val: 2023
+  test: 2024
+  seeds: [0, 1, 2, 3, 42]
+  aggregation: mean of dollar-scale forecasts
+  models:
+    baseline: xgb_exog 37 features including miss_chronos
+    augmented: xgb_both 43 features
+
+inference:
+  bootstrap:
+    block_hours: 24
+    draws: 2000
+    seed: 0
+    interval: percentile
+    p_value: interval_inversion
+  diebold_mariano:
+    bartlett_lag: 24
+    hln_h_primary: 1
+    hln_h_original: 25
+  holm_families:
+    E1_matched: [B512_plus_chronos_vs_B512, original_augmented_vs_B512]
+    E3_not_matched: [xgb_lear_vs_xgb, xgb_lear_chronos_vs_xgb_lear]
+    E4_cache_seeds: [seed0_vs_baseline, seed1_vs_baseline, seed2_vs_baseline, seed3_vs_baseline]
+    E6_delays: [delay_1, delay_2, delay_3, delay_6]
+    E6_load: [load_24h, load_omitted]
+    E6_other: [complete_four, hourly_mean, hb_north]
+    E6_blocks: [block_12, block_24, block_48, block_72, block_168]
+    E7_windows: [E2022, E2023, E2024]
+  equivalence_test: none
+  no_selection_on_evaluation: true
+
+experiments:
+  E0-REPRO:
+    purpose: reproduce saved tables; independent stats; census
+    scoring: none new
+  E1-H512:
+    candidates: [R1, R2, R3]
+    select_on: 2023 five-seed MAE
+    commit_selection_before_2024: true
+    report: [B512_plus_Chronos_vs_B512, original_augmented_vs_B512, original_baseline_separate]
+  E2-CHR:
+    point: chronos_pred
+    origins: frozen 8767
+  E3-LEARAUG:
+    first_stage: expanding OOF LEAR-style, no load
+    label: not strictly matched
+  E4-CSEED:
+    torch_seeds: [0, 1, 2, 3]
+    tree_seeds: [0, 1, 2, 3, 42]
+    delay_hours: 1
+  E5-COST:
+    measure: [cache_wall, chronos_batch1, chronos_batch256, xgb_train, xgb_predict]
+  E6-SENS:
+    status: secondary
+    load_daily_posting_gate: not added; NP6-345-CD posting minute is not documented
+  E7-ROLL:
+    windows:
+      E2022: {train: "2019-2020", val: 2021, test: 2022}
+      E2023: {train: "2019-2021", val: 2022, test: 2023}
+      E2024: {train: "2019-2022", val: 2023, test: 2024}
+    label: retrospective robustness
+  E8-CRISIS:
+    keep_original_seed42: true
+    add_five_seed_refit: true
+    freeze_official_subwindows_before_scoring: true
+
+compute_caps:
+  gpu_devices: ["0"]
+  cache_hours_per_seed_stop: 12
+  total_new_gpu_hours_stop: 48
+  note: Stop at twice the estimate. Do not start paid compute.
+
+e1_representations:
+  R1: dense lags 1-24, 48, 72, 96, 120, 144, 168, 336, 504 added to the 37 baseline columns
+  R2: 72h and 512h window summaries added to the 37 baseline columns
+  R3: R1 union R2
