@@ -1,0 +1,76 @@
+# E8 official sub-windows. Frozen before any E8 sub-window metric is computed.
+# Hour-start UTC inclusive/exclusive. Calendar is US/Central (CST in February 2021).
+# These windows partition the inherited crisis span 2021-02-10 06:00 UTC to
+# 2021-02-21 06:00 UTC. They are descriptive labels from official timestamps,
+# not a claim that prices change at those instants.
+
+name: e8-official-subwindows-v1
+frozen_utc: "2026-10-26T04:20:00Z"
+inherited_crisis_span:
+  start_utc: "2021-02-10T06:00:00Z"   # 2021-02-10 00:00 CST
+  end_utc: "2021-02-21T06:00:00Z"     # exclusive; 2021-02-21 00:00 CST
+  source: "models/run_pit_verified.py CRISIS_START/CRISIS_END; manuscript Feb 10-20 Central"
+
+windows:
+  onset:
+    start_utc: "2021-02-10T06:00:00Z"  # 2021-02-10 00:00 CST
+    end_utc: "2021-02-15T06:00:00Z"    # exclusive; last hour 2021-02-14 23:00 CST
+    rationale: >
+      FERC/NERC Final Report (Nov 2021) states that freezing precipitation and
+      snow started February 10 and extended into the week of February 14, and
+      that unplanned generation outages escalated late on February 14. ERCOT
+      set an all-time winter peak of 69,871 MW at 8:00 p.m. on February 14.
+      This window is the inherited crisis span before the first Energy
+      Emergency Alert.
+    sources:
+      - id: ferc_nerc_2021
+        locator: Executive summary; Event narrative (freezing precipitation starting Feb 10; winter peak 8:00 p.m. Feb 14)
+        url: https://www.ferc.gov/sites/default/files/2021-12/Cold%20Weather%20Report_%202021_120821.pdf
+
+  emergency:
+    start_utc: "2021-02-15T06:00:00Z"  # 2021-02-15 00:00 CST; contains EEA 1 at 00:15
+    end_utc: "2021-02-19T15:00:00Z"    # exclusive; last hour 2021-02-19 08:00 CST
+    rationale: >
+      FERC/NERC: ERCOT issued EEA 1 at 12:15 a.m. February 15, frequency
+      declined from about 12:18 a.m., and the first 1,000 MW firm-load-shed
+      order was at 1:20 a.m. (EEA 3). PUC Project 51812 (order discussing the
+      event) states ERCOT remained in EEA 3 through 9:00 a.m. February 19.
+      Hour starts that overlap EEA 1 through the last full hour still in EEA 3
+      are 00:00 CST February 15 through 08:00 CST February 19.
+    sources:
+      - id: ferc_nerc_2021
+        locator: "EEA 1 12:15 a.m. Feb 15; first 1,000 MW shed 1:20 a.m.; EEA 3"
+        url: https://www.ferc.gov/sites/default/files/2021-12/Cold%20Weather%20Report_%202021_120821.pdf
+      - id: ercot_ops_messages_wayback
+        locator: "EEA 1 00:15; EEA 2 01:07; EEA 3 with firm load shed 01:20 CST Feb 15"
+        url: https://web.archive.org/web/20210215225148/www.ercot.com/services/comm/mkt_notices/opsmessages
+      - id: puc_51812
+        locator: "ERCOT remained in EEA3 through 9AM on February 19, 2021"
+        url: http://interchange.puc.texas.gov/Documents/51812_59_1113950.PDF
+
+  recovery:
+    start_utc: "2021-02-19T15:00:00Z"  # 2021-02-19 09:00 CST; EEA 3 ended
+    end_utc: "2021-02-21T06:00:00Z"    # exclusive; inherited crisis end
+    rationale: >
+      PUC 51812: EEA 3 through 9:00 a.m. February 19. ERCOT legislative
+      hearing slides (Feb 25, 2021): approximately 9:00 a.m. return to EEA 2,
+      10:00 a.m. EEA 1, 10:35 a.m. normal operations. FERC/NERC: February 19
+      9:00 a.m. downgrade to EEA 2 and 10:35 a.m. further downgrade. The
+      inherited manuscript window continues through February 20 Central.
+    sources:
+      - id: puc_51812
+        locator: EEA3 through 9AM February 19, 2021
+        url: http://interchange.puc.texas.gov/Documents/51812_59_1113950.PDF
+      - id: ercot_legislature_2021_02_25
+        locator: "Feb 19 approx. 9 a.m. EEA 2, 10 a.m. EEA 1, 10:35 a.m. normal"
+        url: https://www.ercot.com/files/docs/2021/03/03/Texas_Legislature_Hearings_2-25-2021.pdf
+      - id: ferc_nerc_2021
+        locator: "February 19, 9:00 a.m. EEA 2; 10:35 a.m. further downgrade"
+        url: https://www.ferc.gov/sites/default/files/2021-12/Cold%20Weather%20Report_%202021_120821.pdf
+
+notes:
+  - Hour alignment includes any hour whose start is inside the UTC interval.
+  - CST offset is UTC-6. No DST in mid-February.
+  - Windows do not license causal or resilience claims.
+  - The $9,000/MWh offer-cap and related PUC orders are recorded as context
+    only and are not used to move these hour cuts.
