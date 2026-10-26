@@ -1,0 +1,158 @@
+# Machine-readable methods specification for the PES GM 2027 evidence package.
+# Frozen facts about the original experiment, plus the definitions of E0-E8.
+# Dated 2026-10-26. Selection chronology is in PROTOCOL_AND_METHODS.md.
+
+study:
+  label: archived-data evaluation under assumed delays
+  venue_selected: IEEE PES General Meeting 2027
+  target_name: hourly maximum of HB_HUBAVG 15-minute settlement prices
+  issue_time: start of the UTC hour
+  primary_delay_hours: 1
+  delay_set_hours: [1, 2, 3, 6]
+  timezone_storage: UTC
+  timezone_calendar: US/Central
+  evaluation_index_hash: b850034b0690e660
+  evaluation_rows: 8767
+  evaluation_start: "2024-01-01T00:00:00+00:00"
+  evaluation_end: "2024-12-31T06:00:00+00:00"
+  train_start: "2019-01-01T00:00:00+00:00"
+  val_start: "2023-01-01T00:00:00+00:00"
+  test_start: "2024-01-01T00:00:00+00:00"
+  inherited_matrix_rows: 77956
+  inherited_matrix_start: "2016-01-31T06:00:00+00:00"
+  train_rows_split_json: 34850
+  train_rows_matrix_index_2019_2022: 34851
+  val_rows: 8760
+
+target:
+  construction: max of the four 15-minute prices whose Interval Start is t, t+15min, t+30min, t+45min
+  incomplete_hours_kept: true
+  evaluation_incomplete_hours: ["2024-12-31T06:00:00+00:00"]
+  spike_threshold_usd: 200
+  spike_rule: strict greater than
+  spike_threshold_origin: inherited code constant; rationale [MISSING]
+
+features:
+  baseline_count: 37
+  augmented_count: 43
+  baseline_includes_miss_chronos: true
+  asinh_clip: 10
+  asinh_applied_to: signed price-like columns (see src/features/pit_sets.py signed_asinh_columns)
+  imputation: training-split median, then missingness flags
+  baseline_columns:
+    price_history: [hubavg_lag_1h, hubavg_lag_12h, hubavg_lag_24h, hubavg_lag_48h, hubavg_lag_168h, hubavg_lag_720h, hubavg_rollmean_24h, hubavg_rollstd_24h, hubavg_rollmean_168h, hubavg_rollstd_168h]
+    rt15: [rt15_last, rt15_max, rt15_min, rt15_mean]
+    dam: [da_HB_HOUSTON, da_HB_NORTH, da_HB_SOUTH, da_HB_WEST, da_HB_HUBAVG, da_shape_ramp, da_shape_day_max, da_shape_day_min, da_shape_spread_24h]
+    load: [load_lag_1h, load_rollmean_24h]
+    storage: [storage_bcf, storage_wow_change, storage_bcf_lag_1w]
+    calendar: [hour_local, day_of_week_local, month_local, is_weekend_local, is_peak_local]
+    missing: [miss_load, miss_storage, miss_da, miss_chronos]
+  chronos_columns: [chronos_pred, chronos_q10, chronos_q90, chronos_mean, chronos_p_gt200, chronos_spread]
+  gates:
+    rt_and_load_primary: t - (1 + delay_hours)
+    dam: 14:00 US/Central on local D-1 for operating day D
+    storage: week-ending Friday + 7 days 18 hours
+
+xgboost:
+  library: xgboost==2.1.4
+  constructor: models.improve_hybrid.make_model
+  n_estimators: 2000
+  max_depth: 6
+  learning_rate: 0.05
+  min_child_weight: 1
+  subsample: 0.8
+  colsample_bytree: 0.8
+  objective: reg:absoluteerror
+  eval_metric: mae
+  tree_method: hist
+  device: cuda
+  early_stopping_rounds: 50
+  early_stopping_split: 2023
+  target_transform: asinh
+  decode: sinh(clip(pred, -10, 10))
+  seeds: [0, 1, 2, 3, 42]
+  primary_seed: 42
+  aggregation: arithmetic mean of dollar-scale forecasts, then score
+  primary_best_iteration:
+    xgb_exog: {0: 624, 1: 685, 2: 410, 3: 559, 42: 584}
+    xgb_both: {0: 412, 1: 749, 2: 533, 3: 706, 42: 440}
+
+chronos:
+  checkpoint: amazon/chronos-t5-small
+  revision: a971ba21945c4f1796b17a91fe69214b5f4ad472
+  context_clock_hours: 512
+  missing_hours: left as NaN; not compressed
+  prediction_length: 1 + delay_hours
+  step_index: delay_hours
+  num_samples: 20
+  temperature: 1.0
+  top_k: 50
+  top_p: 1.0
+  batch_size: 256
+  torch_dtype: bfloat16
+  original_seed: 0
+  median: torch.median lower median
+  quantiles: torch.quantile linear
+  exceedance: strict greater than 200
+  context_nan_on_inherited_index:
+    train_2019_2022: {n: 34851, rows_with_nan: 345, max_nan_hours: 23, first: "2021-01-08T06:00:00+00:00", last: "2021-01-22T14:00:00+00:00"}
+    val_2023: {n: 8760, rows_with_nan: 0, max_nan_hours: 0}
+    test_2024: {n: 8767, rows_with_nan: 0, max_nan_hours: 0}
+    crisis2021_scored: {n: 8563, rows_with_nan: 345, max_nan_hours: 23}
+  consequence_of_nan: The phrase 512-hour context means 512 clock hours. On 345 training and crisis rows the window contains up to 23 missing hours from the 2020-12-31 fetch gap. Validation and 2024 evaluation windows are complete.
+
+inference:
+  loss: absolute error on the dollar-scale seed-average forecast
+  paired_differential: abs(y - pred_a) - abs(y - pred_b)
+  bootstrap:
+    type: non-circular moving block
+    block_hours: 24
+    draws: 2000
+    seed: 0
+    gap_split_hours: 1.5
+    interval: percentile
+    p_value: interval inversion, floored at 1/2000
+    supplementary_p: null-centered
+  diebold_mariano:
+    kernel: Bartlett
+    lag: 24
+    primary_hln_h: 1
+    original_hln_h: 25
+    reference: t(n-1)
+  holm: within predeclared secondary families only
+  equivalence_test: none
+
+baselines_original:
+  persistence: hubavg_lag_1h under the same delay (latest legal hour)
+  seasonal_naive_24: hour t-24
+  seasonal_naive_168: hour t-168
+  lear_style:
+    lags: [1-24, 48, 168]
+    extras: gated da_HB_HUBAVG, load_lag_1h, Central dummies
+    estimator: Lasso, alphas geomspace(1e-6, 10, 15), max_iter 100000
+    target: asinh
+  lasso_primary_ablation: np.logspace(-4, 2, 19)
+
+new_experiments:
+  E0-REPRO: reproduce saved tables; do not overwrite original run directories
+  E1-H512:
+    candidates: [R1, R2, R3]
+    R1_lags: [1-24, 48, 72, 96, 120, 144, 168, 336, 504]
+    R2_windows: [72, 512]
+    R2_stats: [mean, std, min, max, q10, q50, q90, frac_gt200]
+    selection: 2023 five-seed MAE only; commit before scoring 2024
+  E2-CHR: standalone chronos_pred on the frozen 8767 origins
+  E3-LEARAUG:
+    first_stage: expanding-window OOF LEAR-style, no load
+    lags: [1-24, 48, 168]
+    alpha_grid: geomspace(1e-6, 10, 15)
+    label: not strictly matched
+  E4-CSEED: delay-1h caches for torch seeds [0, 1, 2, 3]
+  E5-COST: cache, train, and per-origin timings
+  E6-SENS: delays, load 24h, load omitted, complete-four, blocks, hourly mean, HB_NORTH; load daily-posting gate only if documented (it is not)
+  E7-ROLL:
+    E2022: {train: "2019-2020", val: 2021}
+    E2023: {train: "2019-2021", val: 2022}
+    E2024: original
+    label: retrospective robustness
+  E8-CRISIS: original seed 42 plus five-seed refit; official sub-windows frozen before scoring
