@@ -10,7 +10,7 @@ import pandas as pd
 from models.pes2027.common import SEEDS, TARGET, write_json, write_parquet
 from models.pes2027.protocol import require_frozen
 from models.run_pit_ablation import FROZEN_DEPTH, FROZEN_LR, decode_target, fit_xgb
-from models.run_pit_verified import prepare
+from models.run_pit_verified import columns_for, prepare
 from src.features.pit_sets import feature_subsets
 
 
@@ -22,7 +22,8 @@ def split_index(index: pd.DatetimeIndex, train_end, val_end):
 
 
 def baseline_columns(frame: pd.DataFrame) -> list[str]:
-    return feature_subsets(list(frame.columns))["xgb_exog"]
+    """The original 37 delayed-history columns. Not the target and not Chronos."""
+    return feature_subsets(columns_for(frame, False))["xgb_exog"]
 
 
 def fit_one(frame: pd.DataFrame, columns: list[str], train, val, test, seed: int) -> dict:

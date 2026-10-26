@@ -1,0 +1,101 @@
+{
+  "created_utc": "2026-10-26T04:48:56Z",
+  "protocol": {
+    "path": "evidence/pes_gm_2027/protocol/protocol_v1.yaml",
+    "sha256": "fd6a0b03b5162e6c75ca5cb96936f2bd273b7e5a97dd37a67b3ae08e47f0127a",
+    "commit": "b353520a7f8343d859d4193296e9d592bfb1b1cc",
+    "committed": "2026-10-25T23:00:13-05:00"
+  },
+  "code_revision": {
+    "commit": "f53057fd3627864ed3c0e2928952599fc20f6247",
+    "branch": "pes-gm-2027-evidence",
+    "dirty_tracked_files": [
+      "M models/pes2027/fit.py"
+    ]
+  },
+  "selected": "R1",
+  "rule": "minimum 2023 five-seed-average MAE",
+  "candidates": {
+    "R1": {
+      "val_mae_seed_avg": 38.44211547398804,
+      "n_columns": 64
+    },
+    "R2": {
+      "val_mae_seed_avg": 38.96774372884978,
+      "n_columns": 53
+    },
+    "R3": {
+      "val_mae_seed_avg": 38.80096247846985,
+      "n_columns": 80
+    }
+  },
+  "selected_columns": [
+    "hubavg_lag_1h",
+    "hubavg_lag_12h",
+    "hubavg_lag_24h",
+    "hubavg_lag_48h",
+    "hubavg_lag_168h",
+    "hubavg_lag_720h",
+    "hubavg_rollmean_24h",
+    "hubavg_rollstd_24h",
+    "hubavg_rollmean_168h",
+    "hubavg_rollstd_168h",
+    "rt15_last",
+    "rt15_max",
+    "rt15_min",
+    "rt15_mean",
+    "da_HB_HOUSTON",
+    "da_HB_NORTH",
+    "da_HB_SOUTH",
+    "da_HB_WEST",
+    "da_HB_HUBAVG",
+    "da_shape_ramp",
+    "da_shape_day_max",
+    "da_shape_day_min",
+    "da_shape_spread_24h",
+    "load_lag_1h",
+    "load_rollmean_24h",
+    "storage_bcf",
+    "storage_wow_change",
+    "storage_bcf_lag_1w",
+    "hour_local",
+    "day_of_week_local",
+    "month_local",
+    "is_weekend_local",
+    "is_peak_local",
+    "miss_load",
+    "miss_storage",
+    "miss_da",
+    "miss_chronos",
+    "hubavg_lag_2h",
+    "hubavg_lag_3h",
+    "hubavg_lag_4h",
+    "hubavg_lag_5h",
+    "hubavg_lag_6h",
+    "hubavg_lag_7h",
+    "hubavg_lag_8h",
+    "hubavg_lag_9h",
+    "hubavg_lag_10h",
+    "hubavg_lag_11h",
+    "hubavg_lag_13h",
+    "hubavg_lag_14h",
+    "hubavg_lag_15h",
+    "hubavg_lag_16h",
+    "hubavg_lag_17h",
+    "hubavg_lag_18h",
+    "hubavg_lag_19h",
+    "hubavg_lag_20h",
+    "hubavg_lag_21h",
+    "hubavg_lag_22h",
+    "hubavg_lag_23h",
+    "hubavg_lag_72h",
+    "hubavg_lag_96h",
+    "hubavg_lag_120h",
+    "hubavg_lag_144h",
+    "hubavg_lag_336h",
+    "hubavg_lag_504h"
+  ],
+  "train_rows": 34850,
+  "val_rows": 8760,
+  "scored_2024": false
+}

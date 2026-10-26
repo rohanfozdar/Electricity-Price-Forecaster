@@ -12,9 +12,11 @@ import numpy as np
 import pandas as pd
 
 from models.pes2027.common import (
-    RUNS, SEEDS, TARGET, TEST_START, TRAIN_START, VAL_START, git_revision, hourly_max,
-    index_hash, utc_now, write_csv, write_json,
+    EVIDENCE, RUNS, SEEDS, TARGET, TEST_START, TRAIN_START, VAL_START, git_revision,
+    hourly_max, index_hash, utc_now, write_csv, write_json,
 )
+
+SELECTION_RECORD = EVIDENCE / "protocol" / "e1_selection.json"
 from models.pes2027.features_extra import oof_lear, representation
 from models.pes2027.fit import baseline_columns, fit_one, require, save_pred, seed_mean, split_index
 from models.pes2027.indep_stats import paired_summary, point_metrics
@@ -85,15 +87,15 @@ def e1_select() -> dict:
         "scored_2024": False,
     }
     write_json(out / "selection.json", record)
+    write_json(SELECTION_RECORD, record)
     print(record)
     return record
 
 
 def e1_score_2024() -> dict:
     frozen = require()
-    sel_path = RUNS / "E1-H512" / "selection.json"
-    recorded = require_committed(sel_path)
-    selection = __import__("json").loads(sel_path.read_text())
+    recorded = require_committed(SELECTION_RECORD)
+    selection = __import__("json").loads(SELECTION_RECORD.read_text())
     if selection["scored_2024"]:
         raise SystemExit("2024 already marked scored")
     sources = _load()
