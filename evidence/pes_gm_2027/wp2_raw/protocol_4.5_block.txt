@@ -1,0 +1,25 @@
+4.5.2Communicating DAM Results4-89
+4.6DAM Settlement4-93
+4.6.1Day-Ahead Settlement Point Prices4-93
+4.6.1.1Day-Ahead Settlement Point Prices for Resource Nodes4-93
+4.6.1.2Day-Ahead Settlement Point Prices for Load Zones4-94
+4.6.1.3Day-Ahead Settlement Point Prices for Hubs4-95
+4.6.1.4Day-Ahead Settlement Point Prices at the Logical Resource Node for a Combined Cycle Generation Resource4-95
+4.6.2Day-Ahead Energy and Make-Whole Settlement4-96
+4.6.2.1Day-Ahead Energy Payment4-96
+4.6.2.2Day-Ahead Energy Charge4-97
+4.6.2.3Day-Ahead Make-Whole Settlements4-99
+4.6.2.3.1Day-Ahead Make-Whole Payment4-100
+4.6.2.3.2Day-Ahead Make-Whole Charge4-106
+4.6.3Settlement for PTP Obligations Bought in DAM4-109
+4.6.4Settlement of Ancillary Services Procured in the DAM4-112
+4.6.4.1Payments for Ancillary Services Procured in the DAM4-112
+4.6.4.1.1Regulation Up Service Payment4-112
+4.6.4.1.2Regulation Down Service Payment4-113
+4.6.4.1.3Responsive Reserve Payment4-113
+4.6.4.1.4Non-Spinning Reserve Service Payment4-114
+4.6.4.1.5 ERCOT Contingency Reserve Service Payment4-115
+4.6.4.1.6Dispatchable Reliability Reserve Service Payment4-116
+4.6.4.2Charges for Ancillary Services Procurement in the DAM4-117
+4.6.4.2.1Regulation Up Service Charge4-117
+4.6.4.2.2Regulation Down Service Charge4-118
