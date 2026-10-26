@@ -19,8 +19,13 @@ sources:
     rule: interval_end_plus
     interval: 15min
     delay: 0min
-    verified: documented        # ERCOT posts RTM SPPs within minutes of each interval
-    notes: hourly target y[h] = max of the four 15-min SPPs in [h, h+1); y[h] usable from h+1.
+    verified: unverified        # withdrawn: no measured 2019-2024 first-publication time
+    notes: >
+      Zero delay is not a measured posting time. The study file is the weekly
+      historical extract NP6-785-ER (report 13061), not the 15-minute NP6-905-CD
+      feed, and it has no first-publication timestamp. The corrected features
+      pass an explicit extra delay in src/features/pit_sets.py. See
+      reports/source_evidence_register.md.
 
   ercot_da_prices:
     file: ercot_da_prices.parquet
@@ -34,7 +39,7 @@ sources:
     rule: interval_end_plus
     interval: 1h
     delay: 0min
-    verified: assumed           # real-time system demand is posted continuously
+    verified: assumed           # daily archive NP6-345-CD; live-display timing was not measured
     coverage_start: "2019-01-01"
 
   weather_obs:

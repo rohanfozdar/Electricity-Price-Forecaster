@@ -26,7 +26,7 @@ The tree and the stack were not ranked against each other before 2024 was scored
 
 ## Information set
 
-Every feature used for hour t is known at the start of that hour.
+The table above is the historical honest-tree protocol. It does not establish that every input was published at the start of hour t. Column-level availability is in [reports/claim_audit.md](reports/claim_audit.md). Same-hour realized load, trade-date gas, week-ending storage, report-date reactor status, and archive weather are still in that fit. The matched Chronos ablation is in [reports/pit_ablation.md](reports/pit_ablation.md).
 
 Weather is lagged one hour by the clock. The lagged fields are temperature, wind, humidity, cloud cover, precipitation, and gusts at Houston, Dallas, San Antonio, and Midland, together with the weather stress flags built from them. `stress_score` is the sum of those lagged weather flags, the gas flag, and the reactor-outage flag.
 
