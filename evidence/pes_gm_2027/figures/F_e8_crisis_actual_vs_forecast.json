@@ -1,0 +1,6 @@
+{
+  "file": "runs/pes2027/E8-CRISIS/figures/crisis_actual_vs_forecast.png",
+  "source": "runs/pes2027/E8-CRISIS/original_seed42_per_origin.parquet",
+  "slice": "inherited_crisis",
+  "created_utc": "2026-10-26T04:08:57Z"
+}

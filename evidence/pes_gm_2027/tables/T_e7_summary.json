@@ -1,0 +1,116 @@
+{
+  "protocol": {
+    "path": "evidence/pes_gm_2027/protocol/protocol_v1.yaml",
+    "sha256": "fd6a0b03b5162e6c75ca5cb96936f2bd273b7e5a97dd37a67b3ae08e47f0127a",
+    "commit": "b353520a7f8343d859d4193296e9d592bfb1b1cc",
+    "committed": "2026-10-25T23:00:13-05:00"
+  },
+  "created_utc": "2026-10-26T04:32:49Z",
+  "windows": {
+    "E2022": {
+      "n_train": 17527,
+      "n_val": 8563,
+      "n_test": 8760,
+      "index_hash": "784a8188ceed55f8",
+      "mae": {
+        "xgb_exog": 45.353966165847325,
+        "xgb_both": 40.59844982643304
+      },
+      "mae_chronos": 35.157051743703235,
+      "mae_persistence": 42.35191666666667,
+      "matched_both_minus_exog": {
+        "n": 8760,
+        "mae_a": 40.59844982643304,
+        "mae_b": 45.353966165847325,
+        "gap_a_minus_b": -4.75551633941429,
+        "ci_low": -6.572136181299647,
+        "ci_high": -3.234842658756051,
+        "p_boot_interval_inversion": 0.0005,
+        "p_boot_centered": 0.0005,
+        "boot_sd": 0.8414238072292547,
+        "block_hours": 24,
+        "n_boot": 2000,
+        "boot_seed": 0,
+        "dm_lag": 24,
+        "dm_stat_hln_h1": -5.790473042296966,
+        "dm_p_hln_h1": 7.260817965443274e-09,
+        "dm_stat_hln_h_lag_plus_1": -5.774607826991464,
+        "dm_p_hln_h_lag_plus_1": 7.976296816573948e-09,
+        "interval_excludes_zero": true
+      },
+      "label": "retrospective robustness"
+    },
+    "E2023": {
+      "n_train": 26090,
+      "n_val": 8760,
+      "n_test": 8760,
+      "index_hash": "1c659ff94e580192",
+      "mae": {
+        "xgb_exog": 43.45649102509621,
+        "xgb_both": 43.64922018224341
+      },
+      "mae_chronos": 45.66823617493506,
+      "mae_persistence": 57.18680821917808,
+      "matched_both_minus_exog": {
+        "n": 8760,
+        "mae_a": 43.64922018224341,
+        "mae_b": 43.45649102509621,
+        "gap_a_minus_b": 0.19272915714720057,
+        "ci_low": -0.16227395779716225,
+        "ci_high": 0.5628983971576094,
+        "p_boot_interval_inversion": 0.297,
+        "p_boot_centered": 0.292,
+        "boot_sd": 0.18375653525320781,
+        "block_hours": 24,
+        "n_boot": 2000,
+        "boot_seed": 0,
+        "dm_lag": 24,
+        "dm_stat_hln_h1": 1.0463784066602715,
+        "dm_p_hln_h1": 0.29541523247403517,
+        "dm_stat_hln_h_lag_plus_1": 1.0435114528567688,
+        "dm_p_hln_h_lag_plus_1": 0.2967402781846352,
+        "interval_excludes_zero": false
+      },
+      "label": "retrospective robustness"
+    },
+    "E2024": {
+      "n_train": 34850,
+      "n_val": 8760,
+      "n_test": 8767,
+      "index_hash": "b850034b0690e660",
+      "mae": {
+        "xgb_exog": 15.068204309560281,
+        "xgb_both": 14.918316602524833
+      },
+      "mae_chronos": 17.794443166543303,
+      "mae_persistence": 25.83959963499487,
+      "matched_both_minus_exog": {
+        "n": 8767,
+        "mae_a": 14.918316602524833,
+        "mae_b": 15.068204309560281,
+        "gap_a_minus_b": -0.14988770703544788,
+        "ci_low": -0.3174348218300273,
+        "ci_high": 0.0637503683225146,
+        "p_boot_interval_inversion": 0.131,
+        "p_boot_centered": 0.105,
+        "boot_sd": 0.09553764372971325,
+        "block_hours": 24,
+        "n_boot": 2000,
+        "boot_seed": 0,
+        "dm_lag": 24,
+        "dm_stat_hln_h1": -1.5409981175091085,
+        "dm_p_hln_h1": 0.12335333937951855,
+        "dm_stat_hln_h_lag_plus_1": -1.5367793352196324,
+        "dm_p_hln_h_lag_plus_1": 0.12438344698875399,
+        "interval_excludes_zero": false
+      },
+      "label": "retrospective robustness"
+    }
+  },
+  "holm_E7_windows": [
+    0.0015,
+    0.297,
+    0.262
+  ],
+  "note": "Shorter early windows. E2022 validation year contains the 2021 crisis. Not an untouched holdout."
+}

@@ -1,0 +1,110 @@
+claim_id,manuscript_location,quoted,full_precision,decimals_quoted,source,note,rounded_full,classification
+N_EVAL,Abstract; Table II; Sec. III-B,8767,8767,0,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,8767,consistent with rounding
+MAE_BOTH,Abstract; Table II; Table III; Table V,14.92,14.918316602524833,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,14.92,consistent with rounding
+MAE_EXOG,Abstract; Table II; Table III; Table V,15.07,15.068204309560279,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,15.07,consistent with rounding
+GAP,Abstract (as 0.15 improvement); Table II; Table V,-0.14999999999999999,-0.14988770703544779,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.14999999999999999,consistent with rounding
+CI_LOW,Abstract; Table II; Table V,-0.32000000000000001,-0.3174348218300273,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.32000000000000001,consistent with rounding
+CI_HIGH,Abstract; Table II; Table V,0.059999999999999998,0.0637503683225146,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.059999999999999998,consistent with rounding
+P_BOOT,Abstract; Table II; Sec. V-A,0.13100000000000001,0.13100000000000001,3,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),Interval-inversion bootstrap p-value; not a null-centered p-value,0.13100000000000001,consistent with rounding
+P_DM,Abstract; Table II; Sec. V-A; Sec. VI-A,0.124,0.12438344698875391,3,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),HLN factor applied with h = 25 (lag + 1); with h = 1 the value is 0.123353,0.124,consistent with rounding
+GAP_PCT,Sec. V-A 'approximately 1.0%',1,0.99472839600634411,1,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,1,consistent with rounding
+RMSE_EXOG,Table II; Table III,121.59999999999999,121.60368706804412,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,121.59999999999999,consistent with rounding
+RMSE_BOTH,Table II; Table III,120.73,120.73352470075731,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,120.73,consistent with rounding
+MEDAE_EXOG,Table II,3,2.9960351038117388,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,3,consistent with rounding
+MEDAE_BOTH,Table II,2.9300000000000002,2.9333796661899214,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,2.9300000000000002,consistent with rounding
+BIAS_EXOG,Table II,-10.779999999999999,-10.775674442404204,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-10.779999999999999,consistent with rounding
+BIAS_BOTH,Table II,-10.380000000000001,-10.38287960474255,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-10.380000000000001,consistent with rounding
+N_SPIKES,Table II; Sec. V-C,114,114,0,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,114,consistent with rounding
+MEAN_SEED_MAE_BOTH,Sec. V-A,15.029999999999999,15.034444726922285,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,15.029999999999999,consistent with rounding
+MEAN_SEED_MAE_EXOG,Sec. V-A,15.17,15.174598075481152,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,15.17,consistent with rounding
+MEAN_SEED_GAP,Sec. V-A,-0.14000000000000001,-0.14015334855886685,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.14000000000000001,consistent with rounding
+SEED0_GAP,Sec. V-A,0.13,0.13019181146979969,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.13,consistent with rounding
+SEED1_GAP,Sec. V-A,-0.14999999999999999,-0.15194044800707651,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.14999999999999999,consistent with rounding
+SEED2_GAP,Sec. V-A,-0.17999999999999999,-0.17779272697690551,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.17999999999999999,consistent with rounding
+SEED3_GAP,Sec. V-A,-0.29999999999999999,-0.29870499535454081,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.29999999999999999,consistent with rounding
+SEED42_GAP,Sec. V-A,-0.20000000000000001,-0.20252038392562,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.20000000000000001,consistent with rounding
+SN168_MAE,Table III,32.350000000000001,32.354302498003875,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,,32.350000000000001,consistent with rounding
+SN24_MAE,Table III,29.579999999999998,29.5800878293601,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,,29.579999999999998,consistent with rounding
+PERS_MAE,Table III,25.84,25.839599634994869,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,,25.84,consistent with rounding
+LASSO_MAE,Table III,26.199999999999999,26.200637121492388,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,,26.199999999999999,consistent with rounding
+LEAR_MAE,Table III; Sec. V-B,16.32,16.315688083717557,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,,16.32,consistent with rounding
+LEAR_RMSE,Table III; Sec. V-B,110.17,110.16565443504945,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,,110.17,consistent with rounding
+LEAR_ALPHA,Sec. V-B,9.9999999999999995e-07,9.9999999999999995e-07,9,runs/final_audit/lear_style.json,,9.9999999999999995e-07,consistent with rounding
+SN168_RMSE,Table III shows a dash ('not supplied by the final research audit'),,185.21216853770227,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,Value exists in runs/pit_verified/baselines.csv,,value omitted in manuscript
+SN24_RMSE,Table III shows a dash ('not supplied by the final research audit'),,176.88848941893582,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,Value exists in runs/pit_verified/baselines.csv,,value omitted in manuscript
+PERS_RMSE,Table III shows a dash ('not supplied by the final research audit'),,169.15495133194233,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,Value exists in runs/pit_verified/baselines.csv,,value omitted in manuscript
+LASSO_RMSE,Table III shows a dash ('not supplied by the final research audit'),,151.32208780015171,2,runs/pit_verified/baselines.csv; runs/final_audit/lear_style.json,Value exists in runs/pit_verified/baselines.csv,,value omitted in manuscript
+SPIKE_PREC_BOTH,Sec. V-C; Table IV,0.622,0.6216216216216216,3,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.622,consistent with rounding
+SPIKE_REC_BOTH,Sec. V-C; Table IV,0.20200000000000001,0.20175438596491219,3,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.20200000000000001,consistent with rounding
+SPIKE_F1_BOTH,Sec. V-C; Table IV,0.30499999999999999,0.30463576158940392,3,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.30499999999999999,consistent with rounding
+SPIKE_PREC_EXOG,Sec. V-C; Table IV,0.55900000000000005,0.55882352941176472,3,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.55900000000000005,consistent with rounding
+SPIKE_REC_EXOG,Sec. V-C; Table IV,0.16700000000000001,0.1666666666666666,3,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.16700000000000001,consistent with rounding
+SPIKE_F1_EXOG,Sec. V-C; Table IV,0.25700000000000001,0.2567567567567568,3,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.25700000000000001,consistent with rounding
+SPIKE_MAE_BOTH,Sec. V-C; Table IV,562.27999999999997,562.27869323280061,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,562.27999999999997,consistent with rounding
+SPIKE_MAE_EXOG,Sec. V-C; Table IV,565.55999999999995,565.56053092715183,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,565.55999999999995,consistent with rounding
+NONSPIKE_MAE_BOTH,Sec. V-C; Table IV,7.71,7.7070508061708001,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,7.71,consistent with rounding
+NONSPIKE_MAE_EXOG,Sec. V-C; Table IV,7.8200000000000003,7.8156762575083425,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,7.8200000000000003,consistent with rounding
+DELAY2_MAE_BOTH,Table V,16.23,16.225105151052841,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,16.23,consistent with rounding
+DELAY2_MAE_EXOG,Table V,16.390000000000001,16.391518086249825,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,16.390000000000001,consistent with rounding
+DELAY2_GAP,Table V,-0.17000000000000001,-0.16641293519698219,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.17000000000000001,consistent with rounding
+DELAY2_CI_LOW,Table V,-0.34000000000000002,-0.34286869085606481,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.34000000000000002,consistent with rounding
+DELAY2_CI_HIGH,Table V,0.040000000000000001,0.043447265794146803,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.040000000000000001,consistent with rounding
+DELAY3_MAE_BOTH,Table V,16.550000000000001,16.546689732084737,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,16.550000000000001,consistent with rounding
+DELAY3_MAE_EXOG,Table V,16.649999999999999,16.649977491327661,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,16.649999999999999,consistent with rounding
+DELAY3_GAP,Table V,-0.10000000000000001,-0.1032877592429219,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.10000000000000001,consistent with rounding
+DELAY3_CI_LOW,Table V,-0.32000000000000001,-0.31846806100701808,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.32000000000000001,consistent with rounding
+DELAY3_CI_HIGH,Table V,0.20000000000000001,0.1996065931370482,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.20000000000000001,consistent with rounding
+DELAY6_MAE_BOTH,Table V,17.030000000000001,17.030071108138625,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,17.030000000000001,consistent with rounding
+DELAY6_MAE_EXOG,Table V,17.120000000000001,17.1172364027402,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,17.120000000000001,consistent with rounding
+DELAY6_GAP,Table V,-0.089999999999999997,-0.087165294601574295,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.089999999999999997,consistent with rounding
+DELAY6_CI_LOW,Table V,-0.17999999999999999,-0.17963670476480131,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.17999999999999999,consistent with rounding
+DELAY6_CI_HIGH,Table V,0.01,0.0095134551891331003,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.01,consistent with rounding
+LOAD24_MAE_BOTH,Table V,15.130000000000001,15.127507621035566,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,15.130000000000001,consistent with rounding
+LOAD24_MAE_EXOG,Table V,15.24,15.239037470681822,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,15.24,consistent with rounding
+LOAD24_GAP,Table V,-0.11,-0.1115298496462542,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.11,consistent with rounding
+LOAD24_CI_LOW,Table V,-0.34000000000000002,-0.34278166302699981,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.34000000000000002,consistent with rounding
+LOAD24_CI_HIGH,Table V,0.23999999999999999,0.23500357537806921,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.23999999999999999,consistent with rounding
+LOADDROP_MAE_BOTH,Table V,14.789999999999999,14.791050840053154,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,14.789999999999999,consistent with rounding
+LOADDROP_MAE_EXOG,Table V,14.970000000000001,14.973859178192528,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,14.970000000000001,consistent with rounding
+LOADDROP_GAP,Table V,-0.17999999999999999,-0.18280833813937039,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.17999999999999999,consistent with rounding
+LOADDROP_CI_LOW,Table V,-0.44,-0.44005330847839053,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,-0.44,consistent with rounding
+LOADDROP_CI_HIGH,Table V,0.17999999999999999,0.1800314278150793,2,runs/pit_verified/comparisons.json (recomputed: runs/pes2027/E0-REPRO),,0.17999999999999999,consistent with rounding
+BLOCK12_CI_LOW,Sec. VI-A,-0.32000000000000001,-0.32057732250790438,2,runs/final_audit/block_lengths.csv,,-0.32000000000000001,consistent with rounding
+BLOCK12_CI_HIGH,Sec. VI-A,0.050000000000000003,0.049734033723201697,2,runs/final_audit/block_lengths.csv,,0.050000000000000003,consistent with rounding
+BLOCK48_CI_LOW,Sec. VI-A,-0.33000000000000002,-0.32594486875712408,2,runs/pit_verified/block_lengths.csv,,-0.33000000000000002,consistent with rounding
+BLOCK48_CI_HIGH,Sec. VI-A,0.059999999999999998,0.056404479818075198,2,runs/pit_verified/block_lengths.csv,,0.059999999999999998,consistent with rounding
+BLOCK72_CI_LOW,Sec. VI-A,-0.34000000000000002,-0.33908655890649952,2,runs/pit_verified/block_lengths.csv,,-0.34000000000000002,consistent with rounding
+BLOCK72_CI_HIGH,Sec. VI-A,0.080000000000000002,0.077020858585516397,2,runs/pit_verified/block_lengths.csv,,0.080000000000000002,consistent with rounding
+BLOCK168_CI_LOW,Sec. VI-A,-0.34000000000000002,-0.3404858398939431,2,runs/pit_verified/block_lengths.csv,,-0.34000000000000002,consistent with rounding
+BLOCK168_CI_HIGH,Sec. VI-A,0.089999999999999997,0.093830752298089598,2,runs/pit_verified/block_lengths.csv,,0.089999999999999997,consistent with rounding
+BLOCK24_DM_P,Sec. VI-A,0.124,0.12438344698875391,3,runs/pit_verified/block_lengths.csv,DM HAC lag equals the block length (24); HLN h = lag + 1,0.124,consistent with rounding
+BLOCK48_DM_P,Sec. VI-A,0.14899999999999999,0.14936701985709261,3,runs/pit_verified/block_lengths.csv,DM HAC lag equals the block length (48); HLN h = lag + 1,0.14899999999999999,consistent with rounding
+BLOCK72_DM_P,Sec. VI-A,0.16500000000000001,0.1645450410390179,3,runs/pit_verified/block_lengths.csv,DM HAC lag equals the block length (72); HLN h = lag + 1,0.16500000000000001,consistent with rounding
+BLOCK168_DM_P,Sec. VI-A,0.188,0.18807712086391379,3,runs/pit_verified/block_lengths.csv,DM HAC lag equals the block length (168); HLN h = lag + 1,0.188,consistent with rounding
+HMEAN_GAP,Sec. VI-B,-0.17999999999999999,-0.17622729635309359,2,runs/pit_verified/hourly_mean.json,,-0.17999999999999999,consistent with rounding
+HMEAN_CI_LOW,Sec. VI-B,-0.28000000000000003,-0.2783402146710226,2,runs/pit_verified/hourly_mean.json,,-0.28000000000000003,consistent with rounding
+HMEAN_CI_HIGH,Sec. VI-B,-0.070000000000000007,-0.074798241521099998,2,runs/pit_verified/hourly_mean.json,,-0.070000000000000007,consistent with rounding
+NORTH_GAP,Sec. VI-B,-0.14999999999999999,-0.1525005377804543,2,runs/pit_verified/hub_north.json,,-0.14999999999999999,consistent with rounding
+NORTH_CI_LOW,Sec. VI-B,-0.28999999999999998,-0.29023795421339099,2,runs/pit_verified/hub_north.json,,-0.28999999999999998,consistent with rounding
+NORTH_CI_HIGH,Sec. VI-B,-0.02,-0.0181229466795596,2,runs/pit_verified/hub_north.json,,-0.02,consistent with rounding
+CRISIS_N,Sec. VI-C; Table VI,264,264,0,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,264,consistent with rounding
+OUTSIDE_N,Table VI caption,8299,8299,0,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,8299,consistent with rounding
+CRISIS_YMAX,Sec. VI-C,9051.5499999999993,9051.5499999999993,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,9051.5499999999993,consistent with rounding
+CRISIS_EXOG_PREDMAX,Sec. VI-C,697.21000000000004,697.20868657240101,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,697.21000000000004,consistent with rounding
+CRISIS_EXOG_MAE,Sec. VI-C; Table VI,3836.73,3836.725203206056,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,3836.73,consistent with rounding
+CRISIS_BOTH_PREDMAX,Sec. VI-C,2366.9400000000001,2366.9424617256723,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,2366.9400000000001,consistent with rounding
+CRISIS_BOTH_MAE,Sec. VI-C; Table VI,3604.1100000000001,3604.113527985472,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,3604.1100000000001,consistent with rounding
+CRISIS_PERS_MAE,Sec. VI-C; Table VI,540.13,540.13075757575768,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,540.13,consistent with rounding
+CRISIS_EXOG_RMSE,Table VI,5523.1599999999999,5523.1575595017021,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,5523.1599999999999,consistent with rounding
+CRISIS_BOTH_RMSE,Table VI,5239.8100000000004,5239.8104349974692,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,5239.8100000000004,consistent with rounding
+CRISIS_PERS_RMSE,Table VI,1446.6900000000001,1446.690347910926,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,1446.6900000000001,consistent with rounding
+OUTSIDE_EXOG_MAE,Sec. VI-C; Table VI,16.93,16.930071388923079,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,16.93,consistent with rounding
+OUTSIDE_BOTH_MAE,Sec. VI-C; Table VI,17.199999999999999,17.198644821955721,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,17.199999999999999,consistent with rounding
+OUTSIDE_PERS_MAE,Sec. VI-C; Table VI,25.829999999999998,25.830559103506445,2,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,25.829999999999998,consistent with rounding
+CRISIS_RAW_MAE,"Sec. VI-C 'approximately $3,824'",3824,3824.1728057647474,0,runs/final_audit/crisis_diagnostics.json (recomputed: runs/pes2027/E0-REPRO/crisis_2021.csv),,3824,consistent with rounding
+TRAIN_MAX,Sec. VI-C,9005.2900000000009,9005.2900000000009,2,runs/final_audit/crisis_diagnostics.json,At 2019-08-13 20:00:00+00:00,9005.2900000000009,consistent with rounding
+TRAIN_N_GT5000,"Sec. VI-C 'ten hours above $5,000'",10,10,0,runs/final_audit/crisis_diagnostics.json,,10,consistent with rounding
+UTC_HOURS_2024,Sec. III-B; App. A-C,8784,8784,0,runs/final_audit/target_reconciliation.json,,8784,consistent with rounding
+ABSENT_2024,Sec. III-B; App. A-C,17,17,0,runs/final_audit/target_reconciliation.json,,17,consistent with rounding
+COMPLETE_N,Sec. VI-B; App. A-C,8766,8766,0,runs/final_audit/complete_four_sensitivity.json,,8766,consistent with rounding
+SINH10,Sec. IV-A,11013,11013.232874703393,0,numpy.sinh(10),,11013,consistent with rounding

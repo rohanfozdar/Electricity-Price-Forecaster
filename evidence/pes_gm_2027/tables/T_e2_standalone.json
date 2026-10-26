@@ -1,0 +1,78 @@
+{
+  "n": 8767,
+  "index_hash": "b850034b0690e660",
+  "metrics": {
+    "n": 8767,
+    "mae": 17.794443166543303,
+    "rmse": 123.97204829082204,
+    "medae": 3.570268173217773,
+    "bias_pred_minus_y": -9.892402527306905,
+    "n_spikes": 114,
+    "n_pred_spikes": 50,
+    "tp": 22,
+    "fp": 28,
+    "fn": 92,
+    "spike_precision": 0.44,
+    "spike_recall": 0.19298245614035087,
+    "spike_f1": 0.2682926829268293,
+    "spike_mae": 596.3505745827522,
+    "nonspike_mae": 10.172185107899152,
+    "stress_mae_y_gt_100": 294.53292316151305,
+    "normal_mae_y_le_100": 8.192045772642544,
+    "pred_max": 1043.7608642578125,
+    "y_max": 4981.33
+  },
+  "vs_persistence": {
+    "n": 8767,
+    "segments": [
+      8767
+    ],
+    "mae_a": 17.794443166543303,
+    "mae_b": 25.83959963499487,
+    "gap_a_minus_b": -8.045156468451564,
+    "ci_low": -11.391448317991381,
+    "ci_high": -5.436451485221515,
+    "p_boot_interval_inversion": 0.0005,
+    "p_boot_centered": 0.0005,
+    "boot_sd": 1.538274991315365,
+    "block_hours": 24,
+    "n_boot": 2000,
+    "boot_seed": 0,
+    "dm_lag": 24,
+    "dm_stat_hln_h1": -5.2463689071418305,
+    "dm_p_hln_h1": 1.5875226148858924e-07,
+    "dm_stat_hln_h_lag_plus_1": -5.232005951095339,
+    "dm_p_hln_h_lag_plus_1": 1.7155816877825295e-07,
+    "interval_excludes_zero": true
+  },
+  "vs_xgb_exog": {
+    "n": 8767,
+    "segments": [
+      8767
+    ],
+    "mae_a": 17.794443166543303,
+    "mae_b": 15.068204309560281,
+    "gap_a_minus_b": 2.726238856983021,
+    "ci_low": 1.8526936943426997,
+    "ci_high": 3.6938582773575552,
+    "p_boot_interval_inversion": 0.0005,
+    "p_boot_centered": 0.0005,
+    "boot_sd": 0.47462054240139456,
+    "block_hours": 24,
+    "n_boot": 2000,
+    "boot_seed": 0,
+    "dm_lag": 24,
+    "dm_stat_hln_h1": 5.694848509958536,
+    "dm_p_hln_h1": 1.2746445186192417e-08,
+    "dm_stat_hln_h_lag_plus_1": 5.679257753706414,
+    "dm_p_hln_h_lag_plus_1": 1.3959710363295777e-08,
+    "interval_excludes_zero": true
+  },
+  "protocol": {
+    "path": "evidence/pes_gm_2027/protocol/protocol_v1.yaml",
+    "sha256": "fd6a0b03b5162e6c75ca5cb96936f2bd273b7e5a97dd37a67b3ae08e47f0127a",
+    "commit": "b353520a7f8343d859d4193296e9d592bfb1b1cc",
+    "committed": "2026-10-25T23:00:13-05:00"
+  },
+  "created_utc": "2026-10-26T04:07:02Z"
+}

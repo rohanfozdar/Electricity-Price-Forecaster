@@ -1,0 +1,15 @@
+id,status,kind,artifact,n,index_hash,note
+E0-REPRO,reproduced,original_2024,runs/pes2027/E0-REPRO/summary.json,8767,b850034b0690e660,410 independent checks; 0 failed
+E0-RERUN,newly_measured,original_2024,runs/pes2027/E0-REPRO/rerun/rerun_summary.json,8767,b850034b0690e660,10 primary trees refit; max abs diff vs saved 0.0
+E1-select,newly_measured,new_control,evidence/pes_gm_2027/protocol/e1_selection.json,8760,,2023 only; committed d027226 before 2024; selected R1
+E1-score,newly_measured,new_control,runs/pes2027/E1-H512/score_2024.json,8767,b850034b0690e660,B512=R1; gap -0.220 vs B512; CI covers 0
+E2-CHR,newly_measured,new_control,runs/pes2027/E2-CHR/standalone.json,8767,b850034b0690e660,chronos_pred MAE 17.79; worse than xgb_exog 15.07; better than persistence 25.84
+E3-LEARAUG,newly_measured,new_control,runs/pes2027/E3-LEARAUG/summary.json,8767,b850034b0690e660,not strictly matched; LEAR +0.031 vs XGB; Chronos -0.196 vs XGB+LEAR; both CIs cover 0
+E4-CSEED,newly_measured,new_control,runs/pes2027/E4-CSEED/summary.json,8767,b850034b0690e660,seed 0 regenerates headline gap; seed 1 nominal p=0.046; Holm family not significant
+E5-COST,newly_measured,new_control,runs/pes2027/E5-COST/cost.json,,,cache ~285 s/seed; batch-256 3.07 ms/origin; XGB train ~1.8 s
+E6-SENS,reproduced,secondary,runs/pes2027/E6-SENS/sensitivities.csv,8767,b850034b0690e660,saved predictions; Holm inside predeclared families; no load daily-posting gate
+E7-ROLL,newly_measured,retrospective,runs/pes2027/E7-ROLL/summary.json,,,E2022/E2023/E2024; E2024 matches original; not an untouched holdout
+E8-original,reproduced,diagnostic,runs/pes2027/E8-CRISIS/original_seed42.csv,264,,seed 42; names corrected; official windows frozen first
+E8-refit,newly_measured,diagnostic,runs/pes2027/E8-CRISIS/five_seed.csv,264,,five-seed average on the same 2021 index
+WP7,verified,venue_lit,evidence/pes_gm_2027/VENUE_AND_NOVELTY.md,,,GM 2027 CFP; 5 pages including references
+original_runs,unchanged,guardrail,evidence/pes_gm_2027/checksums/original_runs_before.sha256,525 files,,after-work check: 525 ok; 0 changed; 0 missing
